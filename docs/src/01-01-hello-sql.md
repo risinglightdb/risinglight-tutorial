@@ -1,10 +1,20 @@
 # Hello, SQL!
 
-作为万里长征的第一步，在这一节中我们会构建起 RisingLight 数据库的基本框架，并且使它能够运行最简单的 SQL 语句。
+作为万里长征的第一步，在这个任务中我们会构建起 RisingLight 数据库的基本框架，并且使它能够运行最简单的 SQL 语句。
 
 <!-- toc -->
 
 ## 背景知识
+
+### 数据库
+
+数据库是结构化数据的有组织集合。它通常是大部分应用存储数据的核心组件。
+
+针对不同的应用场景，数据库演化出了非常多的类型。按数据模型来分，有传统的关系数据库、对象、文档、KV、图、流、时序数据库等。
+按业务特点来分，则主要有事务型（OLTP）和分析型（OLAP）两种。其中前者以增删改为主，后者以查询为主。
+他们内部的区别主要体现在存储格式上：事务型一般采用按行存储，而分析型则采用列式存储。
+
+我们的 RisingLight 是一个简单的分析型关系数据库。
 
 ### SQL
 
@@ -67,9 +77,9 @@ Rust 在不使用垃圾回收的前提下，通过引入所有权和生命周期
 
 简单介绍完了背景知识，下面我们就可以开始动手了！
 
-在第一个任务中你需要从零开始搭起一个最简单的数据库框架。它需要提供一个可交互的终端，能够接收用户输入的 SQL 命令并输出结果。
+在第一个任务中你需要从零开始搭起一个最简单的数据库框架。它需要提供一个可交互的终端，能够接收用户输入的 SQL 语句并输出结果。
 
-接下来，我们向世界庄严宣告一个伟大的数据库项目从此诞生：
+接下来，向世界庄严宣告我们的数据库项目从此诞生：
 
 ```sql
 > SELECT 'Hello, world!'
@@ -78,17 +88,25 @@ Hello, world!
 
 这就是我们要支持的第一个 SQL 命令：`SELECT` 一个常数，然后输出它：）
 
-除此之外，我们还要搭起一个端到端测试框架，能够运行第一个 sqllogictest 脚本：`01-01.slt`。
+除此之外，我们还要搭起一个端到端测试框架，能够运行第一个 sqllogictest 脚本：[`01-01.slt`]。
+
+[`01-01.slt`]: https://github.com/singularity-data/risinglight/tree/main/code/sql/01-01.slt
+
 
 ## 整体设计
 
-整个项目由以下部分组成：
+为了完成上面的目标，我们需要实现四个简单的模块：
 
-* DB：数据库对象。其中包含两个模块：
-    * Parser：负责解析 SQL 语句并生成抽象语法树（AST）
-    * Executor：负责执行解析后的 SQL 语句
+* Parser：负责解析 SQL 语句并生成抽象语法树（AST）
+* Executor：负责执行解析后的 SQL 语句
 * Shell：一个可交互的命令行终端
-* Test：一个基于 sqllogictest 脚本的端到端测试框架
+* Test：一个基于 sqllogictest 脚本的测试框架
+
+它们之间的关系如图所示：
+
+![](img/01-01-mod.svg)
+
+其中 lib 是数据库的本体，bin 是 `cargo run` 运行的可执行文件，test 是 `cargo test` 运行的测试。
 
 ### SQL Parser
 
@@ -155,11 +173,98 @@ Ok(
 )
 ```
 
+### Executor
+
+在完成 SQL 解析得到抽象语法树后，我们就可以根据 SQL 的语义来执行它。
+
+对于 `SELECT 'Hello, world!'` 来说，你只需要根据上面的结构，逐级提取出 `"Hello, world!"` 字符串即可。
+
+随着之后 SQL 语句变得越来越复杂，我们会在 Parser 和 Executor 之间加入更多的模块。来处理变量绑定和调整执行计划。
+
+### 错误处理
+
+目前为止我们只关注了程序正常执行的情况，但在实际环境下数据库中可能出现各种各样的错误，最常见的比如用户输入了不合法的 SQL 语句。
+因此能够正确地处理错误也是很重要的要求。
+
+Rust 语言中没有 `throw-catch` 的异常机制，而是通过返回 `Result` 类型来处理错误。
+目前在 Rust 生态中错误处理的最佳实践是使用 [thiserror] 库来定义错误类型。
+
+[thiserror]: https://docs.rs/thiserror/1.0.30/thiserror/index.html
+
+在我们的数据库中，每个模块都可能发生一些错误。例如 Parser 模块会返回 sqlparser 定义的 [ParserError]，Executor 未来可能在读写文件时返回标准库定义的 `std::io::Error`。
+而在实现顶层结构时，就需要定义一种 Error 类型把它们聚合起来。我们推荐大家使用下面的风格来实现它：
+
+[ParserError]: https://docs.rs/sqlparser/0.13.0/sqlparser/parser/enum.ParserError.html
+
+```rust,no_run
+pub use sqlparser::parser::ParserError;
+
+/// The error type of execution.
+#[derive(thiserror::Error, Debug)]
+pub enum ExecuteError {
+    // ...
+}
+
+/// The error type of database operations.
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+    #[error("parse error: {0}")]
+    Parse(#[from] ParserError),
+    #[error("execute error: {0}")]
+    Execute(#[from] ExecuteError),
+}
+```
+
+这样，每个模块都返回自己定义的错误类型，在顶层模块中使用 `?` 就可以完成自动类型转换：
+
+```rust,no_run
+mod parser {
+    pub fn parse(sql: &str) -> Result<..., ParserError> {...}
+}
+mod executor {
+    pub fn execute(...) -> Result<..., ExecuteError> {...}
+}
+
+fn run(sql: &str) -> Result<..., Error> {
+    let stmt = parser::parse(sql)?;
+    let output = executor::execute(stmt)?;
+    Ok(output)
+}
+```
+
+### Shell
+
+实现一个朴素的可交互终端非常简单，只需使用标准库提供的 `stdin` 输入，`println!` 宏输出即可。
+
+但是，一个对用户友好的终端一般还需要支持光标移动和历史记录等功能
+（如果你使用 stdin 读取用户输入，那么在按上下左右键时会出现一些奇怪的控制字符）。
+而自己实现这些未免枯燥乏味，因此我们也可以使用第三方库 [rustyline] 来帮我们解决这个问题。
+
+[rustyline]: https://docs.rs/rustyline/9.1.1/rustyline/
+
+一个简单的用法如下：
+
+```rust
+let mut rl = rustyline::Editor::<()>::new();
+loop {
+    match rl.readline("> ") {
+        Ok(line) => {
+            rl.add_history_entry(&line);
+            println!("Line: {:?}", line);
+        }
+        Err(ReadlineError::Eof) => {
+            break;
+        }
+        Err(err) => println!("Error: {:?}", err),
+    }
+}
+```
+
 ### SqlLogicTest
 
-## 源码解析
-
 TODO
-<!-- 
-不知 mdbook 有没有办法自动折叠这段
- -->
+
+### 总结
+
+以上我们介绍了实现一个最简单数据库框架所需的四个模块，每个模块的实现思路和值得关注的问题。
+相信你已经注意到，每个模块中都使用了一个第三方库来帮助我们解决问题，这也是 Rust 语言生态的一大优势。
