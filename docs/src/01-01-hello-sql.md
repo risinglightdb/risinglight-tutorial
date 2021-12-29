@@ -56,15 +56,15 @@ SELECT 1        # 输入的 SQL 语句
 
 我们的 RisingLight 就使用了 sqllogictest 来做端到端测试。你可以在 [`code/sql`] 文件夹下找到每个任务对应的 sqllogictest 测试脚本。
 
-[`code/sql`]: https://github.com/singularity-data/risinglight/tree/main/code/sql
+[`code/sql`]: https://github.com/singularity-data/risinglight-tutorial/tree/main/code/sql
 
 ### Rust
 
 RisingLight 使用 Rust 语言编写！
 
 [Rust] 是新时代的系统级编程语言，主要为了解决 C/C++ 中的内存安全问题而生。
-Rust 在不使用垃圾回收的前提下，通过引入所有权和生命周期等机制在编译期保证程序不会非法使用内存，使得程序既运行高效又安全可靠。
-这使得它成为编写数据库的很好选择。
+Rust 在不使用垃圾回收的前提下，通过引入所有权和生命周期等机制在编译期保证程序不会非法使用内存，让程序既运行高效又安全可靠。
+这使得它成为编写数据库系统的很好选择。
 
 [Rust]: https://www.rust-lang.org
 
@@ -77,9 +77,7 @@ Rust 在不使用垃圾回收的前提下，通过引入所有权和生命周期
 
 简单介绍完了背景知识，下面我们就可以开始动手了！
 
-在第一个任务中你需要从零开始搭起一个最简单的数据库框架。它需要提供一个可交互的终端，能够接收用户输入的 SQL 语句并输出结果。
-
-接下来，向世界庄严宣告我们的数据库项目从此诞生：
+在第一个任务中你需要从零开始搭起一个最简单的数据库框架。它需要提供一个可交互的终端，能够接收用户输入的 SQL 语句并输出结果：
 
 ```sql
 > SELECT 'Hello, world!'
@@ -90,7 +88,7 @@ Hello, world!
 
 除此之外，我们还要搭起一个端到端测试框架，能够运行第一个 sqllogictest 脚本：[`01-01.slt`]。
 
-[`01-01.slt`]: https://github.com/singularity-data/risinglight/tree/main/code/sql/01-01.slt
+[`01-01.slt`]: https://github.com/singularity-data/risinglight-tutorial/tree/main/code/sql/01-01.slt
 
 
 ## 整体设计
@@ -106,9 +104,20 @@ Hello, world!
 
 ![](img/01-01-mod.svg)
 
-其中 lib 是数据库的本体，bin 是 `cargo run` 运行的可执行文件，test 是 `cargo test` 运行的测试。
+我们可以把它们实现到不同的文件里：
 
-### SQL Parser
+```
+src
+├── parser.rs
+├── executor.rs
+├── lib.rs
+├── main.rs
+└── test.rs
+```
+
+其中 lib 是数据库本体，会被编译成一个程序库。main 是 `cargo run` 运行的可执行文件，test 是 `cargo test` 运行的测试。
+
+### Parser
 
 为了读懂用户输入的 SQL 命令，你首先需要一个 SQL 解析器（Parser）。对于上面这条 SQL 语句来说，自己手写一个字符串解析就足够了。
 不过随着之后 SQL 语句越来越复杂，解析 SQL 的复杂度也会与日俱增。既然我们又不是编译原理课，Parser 并不是我们关注的重点，
@@ -128,8 +137,15 @@ Hello, world!
 当我们要实现解析某种特定的 SQL 语句时，一个好办法是直接 debug 输出解析后 AST 的完整结构，观察我们想要的东西分别被解析到了哪个位置上，然后在代码中提取相应的内容。
 
 ```rust,no_run
-// 01-01/src/bin/print-ast.rs
-{{#include ../../code/01-01/src/bin/print-ast.rs}}
+use sqlparser::dialect::PostgreSqlDialect;
+use sqlparser::parser::Parser;
+
+fn main() {
+    let mut sql = String::new();
+    std::io::stdin().read_line(&mut sql).unwrap();
+    let stmts = Parser::parse_sql(&PostgreSqlDialect {}, &sql);
+    println!("{:#?}", stmts);
+}
 ```
 
 例如我们使用上述代码，输入 `SELECT 'Hello, world!'`，就会得到以下输出：
@@ -177,14 +193,34 @@ Ok(
 
 在完成 SQL 解析得到抽象语法树后，我们就可以根据 SQL 的语义来执行它。
 
-对于 `SELECT 'Hello, world!'` 来说，你只需要根据上面的结构，逐级提取出 `"Hello, world!"` 字符串即可。
+对于 `SELECT 'Hello, world!'` 来说，你只需要根据上面的结构，逐级提取出 `"Hello, world!"` 字符串即可：
+
+```rust,no_run
+use sqlparser::{SetExpr, Statement};
+
+match stmt {
+    Statement::Query(query) => match &query.body {
+        SetExpr::Select(select) => {
+            // ...
+        }
+        _ => todo!("not supported statement: {:#?}", stmt),
+    },
+    _ => todo!("not supported statement: {:#?}", stmt),
+}
+```
 
 随着之后 SQL 语句变得越来越复杂，我们会在 Parser 和 Executor 之间加入更多的模块。来处理变量绑定和调整执行计划。
 
 ### 错误处理
 
 目前为止我们只关注了程序正常执行的情况，但在实际环境下数据库中可能出现各种各样的错误，最常见的比如用户输入了不合法的 SQL 语句。
-因此能够正确地处理错误也是很重要的要求。
+在开发初期遇到这种情况时，我们可以简单粗暴地直接 panic 中止程序。但是一个合格的程序应该向用户报告错误，而不影响自身正常运行：
+
+```
+> SELET 1
+parse error: Expected an SQL statement, found: SELET
+> |
+```
 
 Rust 语言中没有 `throw-catch` 的异常机制，而是通过返回 `Result` 类型来处理错误。
 目前在 Rust 生态中错误处理的最佳实践是使用 [thiserror] 库来定义错误类型。
@@ -244,27 +280,54 @@ fn run(sql: &str) -> Result<..., Error> {
 
 一个简单的用法如下：
 
-```rust
-let mut rl = rustyline::Editor::<()>::new();
-loop {
-    match rl.readline("> ") {
-        Ok(line) => {
-            rl.add_history_entry(&line);
-            println!("Line: {:?}", line);
+```rust,no_run
+fn main() {
+    let mut rl = rustyline::Editor::<()>::new();
+    loop {
+        match rl.readline("> ") {
+            Ok(line) => {
+                rl.add_history_entry(&line);
+                println!("Line: {:?}", line);
+            }
+            Err(ReadlineError::Interrupted) => {}
+            Err(ReadlineError::Eof) => break,
+            Err(err) => println!("Error: {:?}", err),
         }
-        Err(ReadlineError::Eof) => {
-            break;
-        }
-        Err(err) => println!("Error: {:?}", err),
     }
 }
 ```
 
-### SqlLogicTest
+### Test
 
-TODO
+测试是系统开发中的重要环节。
+这部分我们实现了自己的 [sqllogictest] 库来做测试脚本的解析和运行。
+
+你只需实现一个 Database struct，并为它实现 [`DB`] trait。然后就可以使用 [`Runner`] 来运行测试了：
+
+```rust,no_run
+impl sqllogictest::DB for Database {
+    type Error = Error;
+    fn run(&self, sql: &str) -> Result<String, Self::Error> {...}
+}
+
+#[test]
+fn test() {
+    let script = std::fs::read_to_string(Path::new("../sql/01-01.slt").unwrap();
+    let mut tester = sqllogictest::Runner::new(Database::new());
+    tester.run_script(&script);
+}
+```
+
+我们提供了一份完整的测试框架代码 [test.rs]，你可以直接把它复制到你的项目中。
+
+[sqllogictest]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/
+[`DB`]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/trait.DB.html
+[`Runner`]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/struct.Runner.html#method.run_script
+[test.rs]: https://github.com/singularity-data/risinglight-tutorial/tree/main/code/01-01/src/test.rs
 
 ### 总结
 
 以上我们介绍了实现一个最简单数据库框架所需的四个模块，每个模块的实现思路和值得关注的问题。
-相信你已经注意到，每个模块中都使用了一个第三方库来帮助我们解决问题，这也是 Rust 语言生态的一大优势。
+在每个模块中我们都使用了一个第三方库来快速实现某种功能，这也是 Rust 语言生态的一大优势。
+
+下一步我们将实现 Catalog，为数据定义它的结构，从而为建表和插入做准备。
