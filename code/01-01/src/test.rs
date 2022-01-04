@@ -1,3 +1,11 @@
+// Add the following lines to your Cargo.toml file:
+//
+// ```toml
+// [dev-dependencies]
+// sqllogictest = "0.1"
+// test-case = "1.2"
+// ```
+
 use std::path::Path;
 
 use test_case::test_case;
