@@ -51,11 +51,11 @@
 
 除了名字和类型以外，每一列还有一些可选的属性：
 
-* **非空（Non-nullable）**：表示这一列的值不能为 `NULL`。
+* **非空** `NOT NULL`：表示这一列的值不能为 `NULL`。
 
-* **唯一（Unique）**：表示这一列的值不能重复。
+* **唯一** `UNIQUE`：表示这一列的值不能重复。
 
-* **主键（Primary Key）**：主键能够唯一地表示表中的一行，一般用来作为索引。
+* **主键** `PRIMARY KEY`：主键能够唯一地表示表中的一行，一般用来作为索引。
     
     因此主键一定是唯一且非空的，并且每个表只能有一个主键。例如在上面的学生表中，`id` 就可以作为主键。
 
@@ -65,7 +65,7 @@
 ```sql
 CREATE TABLE student (
     id      INTEGER PRIMARY KEY,
-    name    VARCHAR,
+    name    VARCHAR NOT NULL,
     age     INTEGER
 );
 ```
@@ -87,7 +87,19 @@ SELECT name FROM student;
 
 ### 索引（Index）
 
-TODO
+**索引（Index）** 是对数据库中某一列或多列数据进行排序的结构，用来快速查询表中的记录。
+
+关系型数据库一般会对主键自动创建索引。如果还有其它的列需要大量随机访问或范围查询，就可以手动为它们创建索引来加速。
+例如，我们可以用 DDL 创建学生名字的索引：
+
+```sql
+CREATE INDEX student_name ON student (name);
+```
+
+索引的经典实现是 B+ 树，这是一种适合存储在磁盘上的平衡树。
+
+由于它的实现比较复杂，因此在 RisingLight 中我们暂时不会涉及索引。
+<!-- 以后可以加上？ -->
 
 ### 模式（Schema）
 
@@ -114,11 +126,24 @@ CREATE TABLE school.student (...);
 
 实现 Catalog 相关数据结构，包括：Database，Schema，Table，Column 四个层级。
 
-其中除 Column 外，每一级都至少支持 插入、删除、查找 三种操作。
+能够准确描述上面提到的这种表：
 
-一种可供参考的接口设计：
+```sql
+CREATE TABLE student (
+    id      INTEGER PRIMARY KEY,
+    name    VARCHAR NOT NULL,
+    age     INTEGER
+);
+```
+
+除此之外，这个任务没有新增的 SQL 测试。
+
+## 整体设计
+
+首先，我们提供一种可供参考的接口设计：
 
 ```rust,no_run
+// 整个数据库的 Catalog 根节点
 pub struct DatabaseCatalog {...}
 
 impl DatabaseCatalog {
@@ -127,43 +152,123 @@ impl DatabaseCatalog {
     pub fn del_schema(&self, id: SchemaId) {...}
 }
 
-
+// 一个 Schema 的 Catalog
 pub struct SchemaCatalog {...}
 
 impl SchemaCatalog {
     pub fn id(&self) -> SchemaId {...}
     pub fn name(&self) -> String {...}
-    pub fn add_table(&self, name: &str) -> TableId {...}
+    pub fn add_table(&self, name: &str, columns: &[(String, ColumnDesc)]) -> TableId {...}
     pub fn get_table(&self, id: TableId) -> Option<Arc<TableCatalog>> {...}
     pub fn del_table(&self, id: TableId) {...}
 }
 
-
+// 一个表的 Catalog
 pub struct TableCatalog {...}
 
 impl TableCatalog {
     pub fn id(&self) -> TableId {...}
     pub fn name(&self) -> String {...}
-    pub fn add_column(&self, name: &str) -> ColumnId {...}
     pub fn get_column(&self, id: ColumnId) -> Option<Arc<ColumnCatalog>> {...}
-    pub fn del_column(&self, id: ColumnId) {...}
     pub fn all_columns(&self) -> Vec<Arc<ColumnCatalog>> {...}
 }
 
-
+// 一个列的 Catalog
 pub struct ColumnCatalog {...}
 
 impl ColumnCatalog {
     pub fn id(&self) -> ColumnId {...}
     pub fn name(&self) -> String {...}
+    pub fn desc(&self) -> ColumnDesc {...}
+}
+
+// 一个列的完整属性
+pub struct ColumnDesc {...}
+
+impl ColumnDesc {
+    pub fn is_nullable(&self) -> bool {...}
+    pub fn is_primary(&self) -> bool {...}
     pub fn datatype(&self) -> DataType {...}
+}
+
+// 一个列的数据类型，包含了“可空”信息
+pub struct DataType {...}
+
+impl DataType {
+    pub fn is_nullable(&self) -> bool {...}
+    pub fn kind(&self) -> DataTypeKind {...}
+}
+
+// 一个值的数据类型，不考虑空值
+// 为了方便，我们可以直接使用 sqlparser 中定义的类型
+pub use sqlparser::ast::DataType as DataTypeKind;
+```
+
+为了代码结构清晰，可以把它们拆成多个文件：
+
+```
+src
+├── catalog
+│   ├── mod.rs
+│   ├── database.rs
+│   ├── schema.rs
+│   ├── table.rs
+│   └── column.rs
+├── types.rs
+...
+```
+
+由于 Catalog 会在数据库中多个地方被读取或修改，因此我们把它们设计为 可被共享访问 的数据结构（Send + Sync）。
+这种 struct 的一个特点就是所有方法都标记 `&self` 而不是 `&mut self`，即使对于修改操作也不例外。
+这种模式在 Rust 中被称为 **[内部可变性]**。
+
+[内部可变性]: https://kaisery.github.io/trpl-zh-cn/ch15-05-interior-mutability.html
+
+实现这种模式通常需要定义两层 struct：内层是普通的可变结构，然后在外面包一层锁。
+
+以顶层的 `DatabaseCatalog` 为例：
+
+```rust,no_run
+use std::sync::Mutex;
+
+// 外部 Sync 结构
+pub struct DatabaseCatalog {
+    inner: Mutex<Inner>,    // 对于读多写少的场景，也可以使用 RwLock
+}
+
+// 内部可变结构
+struct Inner {
+    schemas: HashMap<SchemaId, Arc<SchemaCatalog>>,
+    // ...
 }
 ```
 
-除此之外，这个任务没有新增的 SQL 测试。
+当我们为外层结构实现方法的时候，需要先 lock 住内部结构，然后去访问 inner：
 
-## 整体设计
+```rust,no_run
+impl DatabaseCatalog {
+    pub fn get_schema(&self, schema_id: SchemaId) -> Option<Arc<SchemaCatalog>> {
+        let inner = self.inner.lock().unwrap();
+        inner.schemas.get(&schema_id).cloned()
+    }
+}
+```
 
-### Rust 内部可变性
+如果函数体过于复杂，也可以把它拆成多个 Inner 对象上的小函数：
 
-TODO
+```rust,no_run
+impl DatabaseCatalog {
+    pub fn add_schema(&self, name: &str) {
+        let inner = self.inner.lock().unwrap();
+        let id = inner.next_id();
+        inner.add_schema(id, name);
+    }
+}
+
+impl Inner {
+    fn add_schema(&mut self, schema_id: SchemaId, name: &str) {...}
+    fn next_id(&mut self) -> SchemaId {...}
+}
+```
+
+主要的技巧就是这些，代码本身并不复杂。下一步我们就会基于这里定义的数据结构，来实现 `CREATE TABLE` 创建表操作了！
