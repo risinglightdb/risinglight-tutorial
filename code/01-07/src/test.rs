@@ -15,7 +15,7 @@ fn test(name: &str) {
     init_logger();
     let script = std::fs::read_to_string(Path::new("../sql").join(name)).unwrap();
     let mut tester = sqllogictest::Runner::new(Database::new());
-    tester.run_script(&script);
+    tester.run_script(&script).unwrap();
 }
 
 impl sqllogictest::DB for Database {

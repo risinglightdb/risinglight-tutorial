@@ -16,5 +16,5 @@ sqlparser = "0.12"
 thiserror = "1"
 
 [dev-dependencies]
-sqllogictest = "0.1"
+sqllogictest = "0.2"
 test-case = "1.2"
