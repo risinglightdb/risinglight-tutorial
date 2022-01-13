@@ -8,7 +8,7 @@ edition = "2021"
 env_logger = "0.9"
 log = "0.4"
 rustyline = "9"
-sqlparser = "0.12"
+sqlparser = "0.13"
 thiserror = "1"
 
 [dev-dependencies]
