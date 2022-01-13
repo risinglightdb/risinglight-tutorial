@@ -32,10 +32,7 @@ impl Database {
     pub fn new() -> Self {
         let catalog = Arc::new(DatabaseCatalog::new());
         let storage = Arc::new(InMemoryStorage::new());
-        let parallel = match std::env::var("LIGHT_PARALLEL") {
-            Ok(s) if s == "1" => true,
-            _ => false,
-        };
+        let parallel = matches!(std::env::var("LIGHT_PARALLEL"), Ok(s) if s == "1");
         let runtime = if parallel {
             tokio::runtime::Builder::new_multi_thread()
         } else {
