@@ -1,5 +1,8 @@
 //! Execute the queries.
 
+use futures::stream::{BoxStream, StreamExt};
+use futures_async_stream::try_stream;
+
 use crate::array::DataChunk;
 use crate::catalog::CatalogRef;
 use crate::physical_planner::PhysicalPlan;
@@ -22,6 +25,9 @@ use self::projection::*;
 use self::seq_scan::*;
 use self::values::*;
 
+/// The maximum chunk length produced by executor at a time.
+const PROCESSING_WINDOW_SIZE: usize = 1024;
+
 /// The error type of execution.
 #[derive(thiserror::Error, Debug)]
 pub enum ExecuteError {
@@ -29,56 +35,88 @@ pub enum ExecuteError {
     Storage(#[from] StorageError),
 }
 
-pub trait Executor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError>;
-}
-
 /// A type-erased executor object.
-pub type BoxedExecutor = Box<dyn Executor>;
+///
+/// Logically an executor is a stream of data chunks.
+///
+/// It consumes one or more streams from its child executors,
+/// and produces a stream to its parent.
+pub type BoxedExecutor = BoxStream<'static, Result<DataChunk, ExecuteError>>;
 
 /// The builder of executor.
 pub struct ExecutorBuilder {
     catalog: CatalogRef,
     storage: StorageRef,
+    /// An optional runtime handle.
+    ///
+    /// If it is some, spawn the executor to runtime and return a channel receiver.
+    handle: Option<tokio::runtime::Handle>,
 }
 
 impl ExecutorBuilder {
     /// Create a new executor builder.
-    pub fn new(catalog: CatalogRef, storage: StorageRef) -> ExecutorBuilder {
-        ExecutorBuilder { catalog, storage }
+    pub fn new(
+        catalog: CatalogRef,
+        storage: StorageRef,
+        handle: Option<tokio::runtime::Handle>,
+    ) -> ExecutorBuilder {
+        ExecutorBuilder {
+            catalog,
+            storage,
+            handle,
+        }
     }
 
     /// Build executor from a [PhysicalPlan].
     pub fn build(&self, plan: PhysicalPlan) -> BoxedExecutor {
         use PhysicalPlan::*;
-        match plan {
-            PhysicalCreateTable(plan) => Box::new(CreateTableExecutor {
+        let mut executor: BoxedExecutor = match plan {
+            PhysicalCreateTable(plan) => CreateTableExecutor {
                 plan,
                 catalog: self.catalog.clone(),
                 storage: self.storage.clone(),
-            }),
-            PhysicalInsert(plan) => Box::new(InsertExecutor {
+            }
+            .execute(),
+            PhysicalInsert(plan) => InsertExecutor {
                 table_ref_id: plan.table_ref_id,
                 column_ids: plan.column_ids,
                 catalog: self.catalog.clone(),
                 storage: self.storage.clone(),
                 child: self.build(*plan.child),
-            }),
-            PhysicalValues(plan) => Box::new(ValuesExecutor {
+            }
+            .execute(),
+            PhysicalValues(plan) => ValuesExecutor {
                 column_types: plan.column_types,
                 values: plan.values,
-            }),
-            PhysicalExplain(plan) => Box::new(ExplainExecutor { plan: plan.child }),
-            PhysicalDummy(_) => Box::new(DummyExecutor),
-            PhysicalSeqScan(plan) => Box::new(SeqScanExecutor {
+            }
+            .execute(),
+            PhysicalExplain(plan) => ExplainExecutor { plan: plan.child }.execute(),
+            PhysicalDummy(_) => DummyExecutor.execute(),
+            PhysicalSeqScan(plan) => SeqScanExecutor {
                 table_ref_id: plan.table_ref_id,
                 column_ids: plan.column_ids,
                 storage: self.storage.clone(),
-            }),
-            PhysicalProjection(plan) => Box::new(ProjectionExecutor {
+            }
+            .execute(),
+            PhysicalProjection(plan) => ProjectionExecutor {
                 exprs: plan.exprs,
                 child: self.build(*plan.child),
-            }),
+            }
+            .execute(),
+        };
+        if let Some(handle) = &self.handle {
+            // In parallel mode, we spawn the executor into the current tokio runtime,
+            // connect it with a channel, and return the receiver as an executor.
+            // Therefore, when used with tokio multi-thread runtime, they can run in parallel.
+            let (tx, rx) = tokio::sync::mpsc::channel(1);
+            handle.spawn(async move {
+                while let Some(e) = executor.next().await {
+                    tx.send(e).await.unwrap();
+                }
+            });
+            tokio_stream::wrappers::ReceiverStream::new(rx).boxed()
+        } else {
+            executor
         }
     }
 }

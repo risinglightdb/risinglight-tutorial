@@ -7,12 +7,13 @@ pub struct ExplainExecutor {
     pub plan: Box<PhysicalPlan>,
 }
 
-impl Executor for ExplainExecutor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError> {
+impl ExplainExecutor {
+    #[try_stream(boxed, ok = DataChunk, error = ExecuteError)]
+    pub async fn execute(self) {
         let explain_result = format!("{}", *self.plan);
         let chunk = DataChunk::from_iter([ArrayImpl::Utf8(
             [Some(explain_result)].into_iter().collect(),
         )]);
-        Ok(chunk)
+        yield chunk;
     }
 }

@@ -8,14 +8,18 @@ pub struct ProjectionExecutor {
     pub child: BoxedExecutor,
 }
 
-impl Executor for ProjectionExecutor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError> {
-        let chunk = self.child.execute()?;
-        let chunk = self
-            .exprs
-            .iter()
-            .map(|expr| expr.eval_array(&chunk))
-            .collect::<Result<DataChunk, _>>()?;
-        Ok(chunk)
+impl ProjectionExecutor {
+    #[try_stream(boxed, ok = DataChunk, error = ExecuteError)]
+    pub async fn execute(self) {
+        #[for_await]
+        for batch in self.child {
+            let batch = batch?;
+            let chunk = self
+                .exprs
+                .iter()
+                .map(|expr| expr.eval_array(&batch))
+                .collect::<Result<DataChunk, _>>()?;
+            yield chunk;
+        }
     }
 }

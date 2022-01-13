@@ -12,25 +12,30 @@ pub struct ValuesExecutor {
     pub values: Vec<Vec<BoundExpr>>,
 }
 
-impl Executor for ValuesExecutor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError> {
-        let cardinality = self.values.len();
-        let mut builders = self
-            .column_types
-            .iter()
-            .map(|ty| ArrayBuilderImpl::with_capacity(cardinality, ty))
-            .collect_vec();
-        for row in &self.values {
-            for (expr, builder) in row.iter().zip(&mut builders) {
-                let value = expr.eval_const()?;
-                builder.push(&value);
+impl ValuesExecutor {
+    #[try_stream(boxed, ok = DataChunk, error = ExecuteError)]
+    pub async fn execute(self) {
+        for chunk in self.values.chunks(PROCESSING_WINDOW_SIZE) {
+            // Create array builders.
+            let mut builders = self
+                .column_types
+                .iter()
+                .map(|ty| ArrayBuilderImpl::with_capacity(chunk.len(), ty))
+                .collect_vec();
+            // Push value into the builder.
+            for row in chunk {
+                for (expr, builder) in row.iter().zip(&mut builders) {
+                    let value = expr.eval_const()?;
+                    builder.push(&value);
+                }
             }
+            // Finish build and yield chunk.
+            let chunk = builders
+                .into_iter()
+                .map(|builder| builder.finish())
+                .collect::<DataChunk>();
+            yield chunk;
         }
-        let chunk = builders
-            .into_iter()
-            .map(|builder| builder.finish())
-            .collect::<DataChunk>();
-        Ok(chunk)
     }
 }
 
@@ -41,8 +46,8 @@ mod tests {
     use crate::binder::BoundExpr;
     use crate::types::{DataTypeExt, DataTypeKind, DataValue};
 
-    #[test]
-    fn values() {
+    #[tokio::test]
+    async fn values() {
         let values = [[0, 100], [1, 101], [2, 102], [3, 103]];
         let mut executor = ValuesExecutor {
             column_types: vec![DataTypeKind::Int(None).nullable(); 2],
@@ -54,8 +59,9 @@ mod tests {
                         .collect::<Vec<_>>()
                 })
                 .collect::<Vec<_>>(),
-        };
-        let output = executor.execute().unwrap();
+        }
+        .execute();
+        let output = executor.next().await.unwrap().unwrap();
         let expected = [
             ArrayImpl::Int32((0..4).collect()),
             ArrayImpl::Int32((100..104).collect()),

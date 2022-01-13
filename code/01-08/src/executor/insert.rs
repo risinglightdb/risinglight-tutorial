@@ -15,8 +15,9 @@ pub struct InsertExecutor {
     pub child: BoxedExecutor,
 }
 
-impl Executor for InsertExecutor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError> {
+impl InsertExecutor {
+    #[try_stream(boxed, ok = DataChunk, error = ExecuteError)]
+    pub async fn execute(self) {
         let table = self.storage.get_table(self.table_ref_id)?;
         let catalog = self.catalog.get_table(self.table_ref_id).unwrap();
         // Describe each column of the output chunks.
@@ -36,10 +37,14 @@ impl Executor for InsertExecutor {
                 },
             )
             .collect_vec();
-        let chunk = self.child.execute()?;
-        let count = chunk.cardinality();
-        table.append(transform_chunk(chunk, &output_columns))?;
-        Ok(DataChunk::single(count as i32))
+        let mut count = 0;
+        #[for_await]
+        for chunk in self.child {
+            let chunk = transform_chunk(chunk?, &output_columns);
+            count += chunk.cardinality();
+            table.append(chunk)?;
+        }
+        yield DataChunk::single(count as i32);
     }
 }
 

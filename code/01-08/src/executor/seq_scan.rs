@@ -9,11 +9,12 @@ pub struct SeqScanExecutor {
     pub storage: StorageRef,
 }
 
-impl Executor for SeqScanExecutor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError> {
+impl SeqScanExecutor {
+    #[try_stream(boxed, ok = DataChunk, error = ExecuteError)]
+    pub async fn execute(self) {
         let table = self.storage.get_table(self.table_ref_id)?;
-        let chunks = table.all_chunks()?;
-        let chunk = DataChunk::concat(chunks.as_slice());
-        Ok(chunk)
+        for chunk in table.all_chunks()? {
+            yield chunk;
+        }
     }
 }

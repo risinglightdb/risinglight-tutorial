@@ -1,6 +1,7 @@
 //! RisingLight -- an educational OLAP database.
 
 #![deny(unused_must_use)]
+#![feature(generators)]
 
 // Enable macros for logging.
 #[macro_use]

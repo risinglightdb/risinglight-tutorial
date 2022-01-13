@@ -10,8 +10,9 @@ pub struct CreateTableExecutor {
     pub storage: StorageRef,
 }
 
-impl Executor for CreateTableExecutor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError> {
+impl CreateTableExecutor {
+    #[try_stream(boxed, ok = DataChunk, error = ExecuteError)]
+    pub async fn execute(self) {
         let schema = self.catalog.get_schema(self.plan.schema_id).unwrap();
         let table_id = schema.add_table(&self.plan.table_name).unwrap();
         let table = schema.get_table(table_id).unwrap();
@@ -20,6 +21,6 @@ impl Executor for CreateTableExecutor {
         }
         self.storage
             .add_table(TableRefId::new(self.plan.schema_id, table_id))?;
-        Ok(DataChunk::single(1))
+        yield DataChunk::single(1);
     }
 }
