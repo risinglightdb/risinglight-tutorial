@@ -1,4 +1,4 @@
-//! In-memory storage.
+//! Persistent storage on disk.
 //!
 //! RisingLight's in-memory representation of data is very simple. Currently,
 //! it is simple a vector of `DataChunk`. Upon insertion, users' data are
@@ -27,7 +27,7 @@ pub type StorageResult<T> = std::result::Result<T, StorageError>;
 pub type StorageRef = Arc<DiskStorage>;
 pub type DiskTableRef = Arc<DiskTable>;
 
-/// In-memory storage.
+/// Persistent storage on disk.
 pub struct DiskStorage {
     tables: Mutex<HashMap<TableRefId, DiskTableRef>>,
 }
@@ -39,7 +39,7 @@ impl Default for DiskStorage {
 }
 
 impl DiskStorage {
-    /// Create a new in-memory storage.
+    /// Create a new persistent storage on disk.
     pub fn new() -> Self {
         DiskStorage {
             tables: Mutex::new(HashMap::new()),
