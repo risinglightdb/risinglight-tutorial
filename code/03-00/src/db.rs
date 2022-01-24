@@ -12,7 +12,7 @@ use crate::executor::{ExecuteError, ExecutorBuilder};
 use crate::logical_planner::{LogicalPlanError, LogicalPlanner};
 use crate::parser::{parse, ParserError};
 use crate::physical_planner::{PhysicalPlanError, PhysicalPlanner};
-use crate::storage::InMemoryStorage;
+use crate::storage::DiskStorage;
 
 /// The database instance.
 pub struct Database {
@@ -31,7 +31,7 @@ impl Database {
     /// Create a new database instance.
     pub fn new() -> Self {
         let catalog = Arc::new(DatabaseCatalog::new());
-        let storage = Arc::new(InMemoryStorage::new());
+        let storage = Arc::new(DiskStorage::new());
         let parallel = matches!(std::env::var("LIGHT_PARALLEL"), Ok(s) if s == "1");
         let runtime = if parallel {
             tokio::runtime::Builder::new_multi_thread()
