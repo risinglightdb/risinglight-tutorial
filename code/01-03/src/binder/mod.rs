@@ -48,11 +48,11 @@ impl Binder {
     /// Bind a statement.
     pub fn bind(&mut self, stmt: &Statement) -> Result<BoundStatement, BindError> {
         use Statement::*;
-        Ok(match stmt {
-            CreateTable { .. } => BoundStatement::CreateTable(self.bind_create_table(stmt)?),
-            Query(query) => BoundStatement::Select(self.bind_select(query)?),
+        match stmt {
+            CreateTable { .. } => Ok(BoundStatement::CreateTable(self.bind_create_table(stmt)?)),
+            Query(query) => Ok(BoundStatement::Select(self.bind_select(query)?)),
             _ => todo!("bind statement: {:#?}", stmt),
-        })
+        }
     }
 }
 

@@ -16,6 +16,7 @@ pub use self::statement::*;
 pub enum BoundStatement {
     CreateTable(BoundCreateTable),
     Insert(BoundInsert),
+    Select(BoundSelect),
     Explain(Box<BoundStatement>),
 }
 
@@ -58,12 +59,12 @@ impl Binder {
 
     /// Bind a statement.
     pub fn bind(&mut self, stmt: &Statement) -> Result<BoundStatement, BindError> {
+        use Statement::*;
         match stmt {
-            Statement::CreateTable { .. } => {
-                Ok(BoundStatement::CreateTable(self.bind_create_table(stmt)?))
-            }
-            Statement::Insert { .. } => Ok(BoundStatement::Insert(self.bind_insert(stmt)?)),
-            Statement::Explain { statement, .. } => {
+            CreateTable { .. } => Ok(BoundStatement::CreateTable(self.bind_create_table(stmt)?)),
+            Insert { .. } => Ok(BoundStatement::Insert(self.bind_insert(stmt)?)),
+            Query(query) => Ok(BoundStatement::Select(self.bind_select(query)?)),
+            Explain { statement, .. } => {
                 Ok(BoundStatement::Explain(self.bind(&*statement)?.into()))
             }
             _ => todo!("bind statement: {:#?}", stmt),
