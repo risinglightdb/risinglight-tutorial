@@ -6,6 +6,7 @@ use crate::array::DataChunk;
 use crate::types::DataValue;
 use crate::{Database, Error};
 
+#[test_case("01-01.slt")]
 #[test_case("01-03.slt")]
 #[test_case("01-05.slt")]
 fn test(name: &str) {
