@@ -1,6 +1,7 @@
 //! Defination of data types.
 
 pub use sqlparser::ast::DataType as DataTypeKind;
+use sqlparser::ast::Value;
 
 /// Data type with nullable.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -61,6 +62,27 @@ impl ToString for DataValue {
             Self::Int32(v) => v.to_string(),
             Self::Float64(v) => v.to_string(),
             Self::String(v) => v.to_string(),
+        }
+    }
+}
+
+impl From<&Value> for DataValue {
+    fn from(v: &Value) -> Self {
+        match v {
+            Value::Number(n, _) => {
+                if let Ok(int) = n.parse::<i32>() {
+                    Self::Int32(int)
+                } else if let Ok(float) = n.parse::<f64>() {
+                    Self::Float64(float)
+                } else {
+                    panic!("invalid digit: {}", n);
+                }
+            }
+            Value::SingleQuotedString(s) => Self::String(s.clone()),
+            Value::DoubleQuotedString(s) => Self::String(s.clone()),
+            Value::Boolean(b) => Self::Bool(*b),
+            Value::Null => Self::Null,
+            _ => todo!("parse value: {:?}", v),
         }
     }
 }

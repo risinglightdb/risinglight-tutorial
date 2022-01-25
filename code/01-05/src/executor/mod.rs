@@ -7,10 +7,12 @@ use crate::storage::{StorageError, StorageRef};
 
 mod create;
 mod insert;
+mod select;
 mod values;
 
 use self::create::*;
 use self::insert::*;
+use self::select::*;
 use self::values::*;
 
 /// The error type of execution.
@@ -57,6 +59,7 @@ impl ExecutorBuilder {
                     values: stmt.values,
                 }),
             }),
+            BoundStatement::Select(stmt) => Box::new(SelectExecutor { stmt }),
         }
     }
 }

@@ -4,6 +4,7 @@ use test_case::test_case;
 
 use crate::{Database, Error};
 
+#[test_case("01-01.slt")]
 #[test_case("01-03.slt")]
 fn test(name: &str) {
     init_logger();

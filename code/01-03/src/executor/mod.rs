@@ -4,8 +4,10 @@ use crate::binder::BoundStatement;
 use crate::catalog::CatalogRef;
 
 mod create;
+mod select;
 
 use self::create::*;
+use self::select::*;
 
 /// The error type of execution.
 #[derive(thiserror::Error, Debug)]
@@ -36,6 +38,7 @@ impl ExecutorBuilder {
                 stmt,
                 catalog: self.catalog.clone(),
             }),
+            BoundStatement::Select(stmt) => Box::new(SelectExecutor { stmt }),
         }
     }
 }

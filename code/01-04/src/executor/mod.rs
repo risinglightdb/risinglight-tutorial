@@ -6,8 +6,10 @@ use crate::catalog::CatalogRef;
 use crate::storage::{StorageError, StorageRef};
 
 mod create;
+mod select;
 
 use self::create::*;
+use self::select::*;
 
 /// The error type of execution.
 #[derive(thiserror::Error, Debug)]
@@ -43,6 +45,7 @@ impl ExecutorBuilder {
                 catalog: self.catalog.clone(),
                 storage: self.storage.clone(),
             }),
+            BoundStatement::Select(stmt) => Box::new(SelectExecutor { stmt }),
         }
     }
 }
