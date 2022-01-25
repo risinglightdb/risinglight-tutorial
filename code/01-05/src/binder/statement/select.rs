@@ -18,7 +18,7 @@ impl Binder {
                         _ => todo!("not supported statement: {:#?}", query),
                     }
                 }
-                return Ok(BoundSelect { values });
+                Ok(BoundSelect { values })
             }
             _ => todo!("not supported statement: {:#?}", query),
         }

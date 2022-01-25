@@ -9,9 +9,7 @@ pub struct SelectExecutor {
 
 impl Executor for SelectExecutor {
     fn execute(&mut self) -> Result<DataChunk, ExecuteError> {
-        let chunk = (self.stmt.values.iter())
-            .map(|v| ArrayImpl::from(v))
-            .collect();
+        let chunk = self.stmt.values.iter().map(ArrayImpl::from).collect();
         Ok(chunk)
     }
 }
