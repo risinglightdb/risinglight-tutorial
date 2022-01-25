@@ -13,6 +13,7 @@ pub use self::statement::*;
 #[derive(Debug, PartialEq, Clone)]
 pub enum BoundStatement {
     CreateTable(BoundCreateTable),
+    Select(BoundSelect),
 }
 
 /// The error type of bind operations.
@@ -46,12 +47,12 @@ impl Binder {
 
     /// Bind a statement.
     pub fn bind(&mut self, stmt: &Statement) -> Result<BoundStatement, BindError> {
-        match stmt {
-            Statement::CreateTable { .. } => {
-                Ok(BoundStatement::CreateTable(self.bind_create_table(stmt)?))
-            }
+        use Statement::*;
+        Ok(match stmt {
+            CreateTable { .. } => BoundStatement::CreateTable(self.bind_create_table(stmt)?),
+            Query(query) => BoundStatement::Select(self.bind_select(query)?),
             _ => todo!("bind statement: {:#?}", stmt),
-        }
+        })
     }
 }
 
