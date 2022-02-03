@@ -1,0 +1,28 @@
+[package]
+name = "risinglight-03-03"
+version = "0.1.0"
+edition = "2021"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+bitvec = "1.0"
+bytes = "1"
+crc32fast = "1"
+enum_dispatch = "0.3"
+env_logger = "0.9"
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
+futures-async-stream = { git = "https://github.com/taiki-e/futures-async-stream", rev = "944f407" }
+itertools = "0.10"
+log = "0.4"
+prettytable-rs = { version = "0.8", default-features = false }
+rustyline = "9"
+sqlparser = "0.13"
+thiserror = "1"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "sync", "macros"] }
+tokio-stream = "0.1"
+
+[dev-dependencies]
+sqllogictest = "0.2"
+test-case = "1.2"

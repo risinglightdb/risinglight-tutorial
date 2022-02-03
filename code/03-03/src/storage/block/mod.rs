@@ -4,9 +4,11 @@
 //!
 //! [`Block`] is the minimum managing unit in the storage engine.
 
+mod block_index_builder;
 mod primitive_block_builder;
 mod primitive_block_iterator;
 use anyhow::{anyhow, Context, Result};
+pub use block_index_builder::*;
 use bytes::{Buf, BufMut, Bytes};
 pub use primitive_block_builder::*;
 pub use primitive_block_iterator::*;
@@ -29,7 +31,10 @@ pub type Block = Bytes;
 /// | block_type | cksum_type | cksum  |    data     |
 /// |    4B      |     4B     |   8B   |  variable   |
 /// ```
-pub trait BlockBuilder<A: Array> {
+pub trait BlockBuilder<A: Array>: 'static + Send + Sync {
+    /// Create a new block builder
+    fn new(target_size: usize) -> Self;
+
     /// Append one data into the block.
     fn append(&mut self, item: Option<&A::Item>);
 
@@ -45,7 +50,14 @@ pub trait BlockBuilder<A: Array> {
 }
 
 /// An iterator on a block. This iterator requires the block being pre-loaded in memory.
-pub trait BlockIterator<A: Array> {
+pub trait BlockIterator<A: Array>: 'static + Send + Sync {
+    /// Create a new block iterator
+    ///
+    /// Note that this signature won't work for block iterators like `CharBlockIterator`. It will
+    /// requires extra information like `char_width`. If you want to add `CharBlockIterator`
+    /// support, you may refer to RisingLight's ColumnIteratorFactory implementation.
+    fn new(block: Block, row_count: usize) -> Self;
+
     /// Get a batch from the block. A `0` return value means that this batch contains no
     /// element. Some iterators might support exact size output. By using `expected_size`,
     /// developers can get an array of NO MORE THAN the `expected_size`.
