@@ -86,15 +86,19 @@ impl BlockHeader {
         buf.put_u64(self.checksum);
     }
 
-    pub fn decode(&mut self, buf: &mut impl Buf) -> Result<()> {
+    pub fn decode(buf: &mut impl Buf) -> Result<Self> {
         if buf.remaining() < 4 + 4 + 8 {
             return Err(anyhow!("expected 16 bytes"));
         }
-        self.block_type =
+        let block_type =
             BlockType::from_i32(buf.get_i32()).context("expected valid checksum type")?;
-        self.checksum_type =
+        let checksum_type =
             ChecksumType::from_i32(buf.get_i32()).context("expected valid checksum type")?;
-        self.checksum = buf.get_u64();
-        Ok(())
+        let checksum = buf.get_u64();
+        Ok(Self {
+            block_type,
+            checksum_type,
+            checksum,
+        })
     }
 }

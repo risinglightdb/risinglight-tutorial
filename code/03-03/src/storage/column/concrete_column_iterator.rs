@@ -45,7 +45,6 @@ fn get_iterator_for<A: Array, F: BlockIterator<A>>(
 }
 
 impl<A: Array, F: BlockIterator<A>> ConcreteColumnIterator<A, F> {
-    
     pub async fn new(column: Column, start_pos: u32) -> StorageResult<Self> {
         let current_block_id = column
             .index()

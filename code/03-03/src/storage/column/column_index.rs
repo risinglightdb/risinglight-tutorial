@@ -3,10 +3,9 @@ use std::sync::Arc;
 use anyhow::anyhow;
 use bytes::Buf;
 
-use crate::storage::checksum::verify_checksum;
-use crate::storage::{BlockIndex, StorageError, StorageResult, ChecksumType};
-
 use super::ColumnSeekPosition;
+use crate::storage::checksum::verify_checksum;
+use crate::storage::{BlockIndex, ChecksumType, StorageError, StorageResult};
 
 pub const SECONDARY_INDEX_MAGIC: u32 = 0x2333;
 pub const INDEX_FOOTER_SIZE: usize = 4 + 8 + 4 + 8;
@@ -17,6 +16,12 @@ pub struct ColumnIndex {
 }
 
 impl ColumnIndex {
+    pub fn new(indexes: Vec<BlockIndex>) -> Self {
+        Self {
+            indexes: indexes.into(),
+        }
+    }
+
     pub fn index(&self, block_id: u32) -> &BlockIndex {
         &self.indexes[block_id as usize]
     }

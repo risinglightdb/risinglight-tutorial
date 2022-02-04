@@ -14,19 +14,29 @@ mod column_iterator;
 mod concrete_column_iterator;
 mod primitive_column_builder;
 
+#[cfg(test)]
+mod tests;
+
+use anyhow::anyhow;
 use async_trait::async_trait;
+use bytes::Bytes;
 pub use column_builder::*;
 pub use column_iterator::*;
 pub use concrete_column_iterator::*;
 pub use primitive_column_builder::*;
 
 use self::column_index::ColumnIndex;
-use super::{Block, BlockHeader, BlockIndex, ChecksumType, StorageResult};
+use super::checksum::verify_checksum;
+use super::{
+    Block, BlockHeader, BlockIndex, ChecksumType, StorageError, StorageResult, BLOCK_HEADER_SIZE,
+};
 use crate::array::Array;
 
 /// Stores information of a column
 pub struct Column {
     index: ColumnIndex,
+    /// We temporarily store column in-memory.
+    data: Bytes,
 }
 
 /// Options for `ColumnBuilder`s.
@@ -44,6 +54,14 @@ impl ColumnBuilderOptions {
     pub fn default_for_block_test() -> Self {
         Self {
             target_block_size: 128,
+            checksum_type: ChecksumType::None,
+        }
+    }
+
+    #[cfg(test)]
+    pub fn default_for_column_test() -> Self {
+        Self {
+            target_block_size: 4096,
             checksum_type: ChecksumType::None,
         }
     }
@@ -83,37 +101,49 @@ pub trait ColumnIterator<A: Array>: 'static + Send + Sync {
 /// When creating an iterator, a [`ColumnSeekPosition`] should be set as the initial location.
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub enum ColumnSeekPosition {
-    
     RowId(u32),
-    
     SortKey(()),
 }
 
 impl ColumnSeekPosition {
-    
     pub fn start() -> Self {
         Self::RowId(0)
     }
 }
 
 impl Column {
-    
-    pub fn new(index: ColumnIndex) -> Self {
-        Self { index }
+    pub fn new(index: ColumnIndex, data: Bytes) -> Self {
+        Self { index, data }
     }
 
     pub fn index(&self) -> &ColumnIndex {
         &self.index
     }
 
-    
     pub fn on_disk_size(&self) -> u64 {
         let lst_idx = self.index.index(self.index.len() as u32 - 1);
         lst_idx.offset + lst_idx.length
     }
 
-    
-    pub async fn get_block(&self, _block_id: u32) -> StorageResult<(BlockHeader, Block)> {
-        todo!()
+    pub async fn get_block(&self, block_id: u32) -> StorageResult<(BlockHeader, Block)> {
+        let info = self.index.index(block_id);
+        let block = self
+            .data
+            .slice(info.offset as usize..(info.offset as usize + info.length as usize));
+
+        if block.len() < BLOCK_HEADER_SIZE {
+            return Err(StorageError(anyhow!("block is smaller than header size",)));
+        }
+        let mut header = &block[..BLOCK_HEADER_SIZE];
+        let block_data = &block[BLOCK_HEADER_SIZE..];
+        let block_header = BlockHeader::decode(&mut header).map_err(StorageError)?;
+
+        verify_checksum(
+            block_header.checksum_type,
+            block_data,
+            block_header.checksum,
+        )?;
+
+        Ok((block_header, block.slice(BLOCK_HEADER_SIZE..)))
     }
 }
