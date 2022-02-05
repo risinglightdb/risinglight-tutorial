@@ -48,7 +48,7 @@ pub struct ColumnCatalog {
 }
 
 impl ColumnCatalog {
-    pub(super) fn new(id: ColumnId, name: String, desc: ColumnDesc) -> ColumnCatalog {
+    pub fn new(id: ColumnId, name: String, desc: ColumnDesc) -> ColumnCatalog {
         ColumnCatalog { id, name, desc }
     }
 

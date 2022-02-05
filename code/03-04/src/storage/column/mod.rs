@@ -17,14 +17,17 @@ mod primitive_column_builder;
 #[cfg(test)]
 mod tests;
 
+use std::sync::Arc;
+
 use anyhow::anyhow;
 use async_trait::async_trait;
 use bytes::Bytes;
 pub use column_builder::*;
+pub use column_index::*;
+pub use column_index_builder::*;
 pub use column_iterator::*;
 pub use concrete_column_iterator::*;
 pub use primitive_column_builder::*;
-pub use self::column_index::*;
 
 use super::checksum::verify_checksum;
 use super::{
@@ -33,10 +36,10 @@ use super::{
 use crate::array::Array;
 
 /// Stores information of a column
+#[derive(Clone)]
 pub struct Column {
     index: ColumnIndex,
-    /// We temporarily store column in-memory.
-    data: Bytes,
+    file: Arc<std::fs::File>,
 }
 
 /// Options for `ColumnBuilder`s.
@@ -112,8 +115,8 @@ impl ColumnSeekPosition {
 }
 
 impl Column {
-    pub fn new(index: ColumnIndex, data: Bytes) -> Self {
-        Self { index, data }
+    pub fn new(index: ColumnIndex, file: Arc<std::fs::File>) -> Self {
+        Self { index, file }
     }
 
     pub fn index(&self) -> &ColumnIndex {
@@ -127,9 +130,17 @@ impl Column {
 
     pub async fn get_block(&self, block_id: u32) -> StorageResult<(BlockHeader, Block)> {
         let info = self.index.index(block_id);
-        let block = self
-            .data
-            .slice(info.offset as usize..(info.offset as usize + info.length as usize));
+        let info = info.clone();
+        let file = self.file.clone();
+
+        let block = tokio::task::spawn_blocking(move || {
+            use std::os::unix::fs::FileExt;
+            let mut data = vec![0; info.length as usize];
+            file.read_exact_at(&mut data[..], info.offset)?;
+            Ok::<_, StorageError>(Bytes::from(data))
+        })
+        .await
+        .unwrap()?;
 
         if block.len() < BLOCK_HEADER_SIZE {
             return Err(StorageError(anyhow!("block is smaller than header size",)));
