@@ -72,7 +72,7 @@ CREATE TABLE t(c1 int, c2 varchar, c3 float, primary key(v1))
 - Block Cache 更好管理：Block Cache 里的每一项长度几乎相同，只需要限制 Block Cache 的项数就可以很好的估计内存占用。
 - I/O 更可控：Block 是最小的管理单元、最小的读盘单元。如果每个 Block 大小几乎相同，每个 I/O 请求的大小就更可控，延迟也更可控。
 
-由多个相同行数的列组成的文件夹被称为 RowSet：一个 RowSet 由 n 个列和 n 个索引组成，每一列包含相同的行数。
+多个相同行数的列会被放在同一个文件夹中，称为 RowSet。一个 RowSet 由 n 个列和 n 个索引组成，每一列包含相同的行数。
 
 ![](img/03-storage/1-5.svg)
 
