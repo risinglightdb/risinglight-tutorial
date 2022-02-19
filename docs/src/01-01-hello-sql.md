@@ -320,6 +320,8 @@ fn test() {
 
 我们提供了一份完整的测试框架代码 [test.rs]，你可以直接把它复制到你的项目中。
 
+在运行测试时，你可以开启 `RUST_LOG=info` 和 `RUST_BACKTRACE=1` 这两个环境变量。开启这两个选项可以方便定位运行过程的错误。
+
 [sqllogictest]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/
 [`DB`]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/trait.DB.html
 [`Runner`]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/struct.Runner.html#method.run_script
