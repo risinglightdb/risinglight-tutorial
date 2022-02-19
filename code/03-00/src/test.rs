@@ -1,6 +1,3 @@
-#![allow(unused_imports)]
-#![allow(dead_code)]
-
 use std::path::Path;
 
 use test_case::test_case;
@@ -9,6 +6,7 @@ use crate::array::DataChunk;
 use crate::types::DataValue;
 use crate::{Database, Error};
 
+#[test_case("03-01.slt")]
 fn test(name: &str) {
     init_logger();
     let script = std::fs::read_to_string(Path::new("../sql").join(name)).unwrap();
