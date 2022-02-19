@@ -13,7 +13,7 @@ impl SeqScanExecutor {
     #[try_stream(boxed, ok = DataChunk, error = ExecuteError)]
     pub async fn execute(self) {
         let table = self.storage.get_table(self.table_ref_id)?;
-        for chunk in table.all_chunks()? {
+        for chunk in table.all_chunks().await? {
             yield chunk;
         }
     }

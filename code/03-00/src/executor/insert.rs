@@ -3,7 +3,6 @@ use itertools::Itertools;
 use super::*;
 use crate::array::{ArrayBuilderImpl, DataChunk};
 use crate::catalog::{ColumnId, TableRefId};
-use crate::storage::StorageRef;
 use crate::types::{DataType, DataValue};
 
 /// The executor of `INSERT` statement.
@@ -42,7 +41,7 @@ impl InsertExecutor {
         for chunk in self.child {
             let chunk = transform_chunk(chunk?, &output_columns);
             count += chunk.cardinality();
-            table.append(chunk)?;
+            table.append(chunk).await?;
         }
         yield DataChunk::single(count as i32);
     }
