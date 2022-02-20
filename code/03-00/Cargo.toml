@@ -17,6 +17,7 @@ log = "0.4"
 prettytable-rs = { version = "0.8", default-features = false }
 rustyline = "9"
 sqlparser = "0.13"
+tempfile = "3"
 thiserror = "1"
 tokio = { version = "1", features = ["rt", "rt-multi-thread", "sync", "macros", "fs"] }
 tokio-stream = "0.1"

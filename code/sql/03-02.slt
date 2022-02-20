@@ -1,0 +1,17 @@
+# 03-01: RowSet tests
+
+statement ok
+CREATE TABLE t (a INT NOT NULL, b INT NOT NULL, c INT NOT NULL)
+
+statement ok
+INSERT INTO t VALUES (1,10,100)
+
+statement ok
+INSERT INTO t VALUES (2,20,200), (3,30,300)
+
+query III rowsort
+SELECT * FROM t
+----
+1 10 100
+2 20 200
+3 30 300
