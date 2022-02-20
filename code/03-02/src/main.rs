@@ -1,5 +1,6 @@
 //! A simple interactive shell of the database.
 
+use risinglight_03_02::storage::StorageOptions;
 use risinglight_03_02::Database;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
@@ -7,7 +8,9 @@ use rustyline::Editor;
 fn main() {
     env_logger::init();
 
-    let db = Database::new();
+    let db = Database::new(StorageOptions {
+        base_path: "risinglight.db".into(),
+    });
 
     let mut rl = Editor::<()>::new();
     loop {

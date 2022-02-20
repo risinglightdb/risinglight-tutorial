@@ -1,0 +1,14 @@
+# 03-01: Very simple storage test
+
+statement ok
+CREATE TABLE t (a INT NOT NULL, b INT NOT NULL, c INT NOT NULL)
+
+statement ok
+INSERT INTO t VALUES (1,10,100), (2,20,200), (3,30,300)
+
+query III
+SELECT * FROM t
+----
+1 10 100
+2 20 200
+3 30 300
