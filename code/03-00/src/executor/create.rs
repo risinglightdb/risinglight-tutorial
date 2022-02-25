@@ -1,7 +1,6 @@
 use super::*;
 use crate::catalog::TableRefId;
 use crate::physical_planner::PhysicalCreateTable;
-use crate::storage::StorageRef;
 
 /// The executor of `CREATE TABLE` statement.
 pub struct CreateTableExecutor {

@@ -1,35 +1,54 @@
-//! Persistent storage on disk.
-//!
-//! RisingLight's in-memory representation of data is very simple. Currently,
-//! it is simple a vector of `DataChunk`. Upon insertion, users' data are
-//! simply appended to the end of the vector.
-
-mod rowset;
-mod table_transaction;
+//! On-disk storage
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex, RwLock};
+use std::path::PathBuf;
+use std::sync::{Arc, RwLock};
 
-use self::table_transaction::TableTransaction;
-use crate::array::DataChunk;
-use crate::catalog::TableRefId;
+use anyhow::anyhow;
+use bytes::{Buf, BufMut};
+
+use crate::array::{Array, ArrayBuilder, ArrayImpl, DataChunk, I32Array, I32ArrayBuilder};
+use crate::catalog::{ColumnDesc, TableRefId};
 
 /// The error type of storage operations.
 #[derive(thiserror::Error, Debug)]
-pub enum StorageError {
-    #[error("table not found: {0:?}")]
-    NotFound(TableRefId),
-}
+#[error("{0:?}")]
+pub struct StorageError(#[from] anyhow::Error);
 
 /// A specialized `Result` type for storage operations.
 pub type StorageResult<T> = std::result::Result<T, StorageError>;
 
 pub type StorageRef = Arc<DiskStorage>;
-pub type DiskTableRef = Arc<DiskTable>;
+pub type StorageTableRef = Arc<DiskTable>;
 
-/// Persistent storage on disk.
+/// On-disk storage.
 pub struct DiskStorage {
-    tables: Mutex<HashMap<TableRefId, DiskTableRef>>,
+    /// All tables in the current storage engine.
+    tables: RwLock<HashMap<TableRefId, StorageTableRef>>,
+
+    /// The storage options.
+    options: Arc<StorageOptions>,
+}
+
+pub struct StorageOptions {
+    /// The directory of the storage
+    base_path: PathBuf,
+}
+
+pub fn err(error: impl Into<anyhow::Error>) -> StorageError {
+    StorageError(error.into())
+}
+
+/// An on-disk table.
+pub struct DiskTable {
+    /// Id of the table.
+    id: TableRefId,
+
+    /// Columns of the current table.
+    column_descs: Arc<[ColumnDesc]>,
+
+    /// The storage options.
+    options: Arc<StorageOptions>,
 }
 
 impl Default for DiskStorage {
@@ -39,80 +58,96 @@ impl Default for DiskStorage {
 }
 
 impl DiskStorage {
-    /// Create a new persistent storage on disk.
+    /// Create a new in-memory storage.
     pub fn new() -> Self {
         DiskStorage {
-            tables: Mutex::new(HashMap::new()),
+            tables: RwLock::new(HashMap::new()),
+            options: Arc::new(StorageOptions {
+                base_path: "risinglight.db".into(),
+            }),
         }
     }
 
     /// Add a table.
-    pub fn add_table(&self, id: TableRefId) -> StorageResult<()> {
-        let table = Arc::new(DiskTable::new(id));
-        self.tables.lock().unwrap().insert(id, table);
+    pub fn add_table(&self, id: TableRefId, column_descs: &[ColumnDesc]) -> StorageResult<()> {
+        let mut tables = self.tables.write().unwrap();
+        let table = DiskTable {
+            id,
+            options: self.options.clone(),
+            column_descs: column_descs.into(),
+        };
+        let res = tables.insert(id, table.into());
+        if res.is_some() {
+            return Err(anyhow!("table already exists: {:?}", id).into());
+        }
         Ok(())
     }
 
     /// Get a table.
-    pub fn get_table(&self, id: TableRefId) -> StorageResult<DiskTableRef> {
-        self.tables
-            .lock()
-            .unwrap()
+    pub fn get_table(&self, id: TableRefId) -> StorageResult<StorageTableRef> {
+        let tables = self.tables.read().unwrap();
+        tables
             .get(&id)
+            .ok_or_else(|| anyhow!("table not found: {:?}", id).into())
             .cloned()
-            .ok_or(StorageError::NotFound(id))
     }
 }
 
-/// A table in in-memory engine.
-pub struct DiskTable {
-    #[allow(dead_code)]
-    id: TableRefId,
-    inner: RwLock<DiskTableInner>,
+/// Encode an `I32Array` into a `Vec<u8>`.
+fn encode_int32_column(a: &I32Array) -> StorageResult<Vec<u8>> {
+    let mut buffer = Vec::with_capacity(a.len() * 4);
+    for item in a.iter() {
+        if let Some(item) = item {
+            buffer.put_i32_le(*item);
+        } else {
+            return Err(anyhow!("nullable encoding not supported!").into());
+        }
+    }
+    Ok(buffer)
 }
 
-#[derive(Default)]
-struct DiskTableInner {
-    chunks: Vec<DataChunk>,
+fn decode_int32_column(mut data: &[u8]) -> StorageResult<I32Array> {
+    let mut builder = I32ArrayBuilder::with_capacity(data.len() / 4);
+    while data.has_remaining() {
+        builder.push(Some(&data.get_i32_le()));
+    }
+    Ok(builder.finish())
 }
 
 impl DiskTable {
-    fn new(id: TableRefId) -> Self {
-        Self {
-            id,
-            inner: RwLock::new(DiskTableInner::default()),
-        }
+    fn table_path(&self) -> PathBuf {
+        self.options.base_path.join(self.id.table_id.to_string())
     }
 
-    #[allow(dead_code)]
-    async fn write(self: &Arc<Self>) -> StorageResult<TableTransaction> {
-        Ok(TableTransaction::start(self.clone(), false, false).await?)
-    }
-
-    #[allow(dead_code)]
-    async fn read(self: &Arc<Self>) -> StorageResult<TableTransaction> {
-        Ok(TableTransaction::start(self.clone(), true, false).await?)
-    }
-
-    #[allow(dead_code)]
-    async fn update(self: &Arc<Self>) -> StorageResult<TableTransaction> {
-        Ok(TableTransaction::start(self.clone(), false, true).await?)
+    fn column_path(&self, column_id: usize) -> PathBuf {
+        self.table_path().join(format!("{}.col", column_id))
     }
 
     /// Append a chunk to the table.
-    ///
-    /// This interface will be deprecated soon in this tutorial.
-    pub fn append(&self, chunk: DataChunk) -> StorageResult<()> {
-        let mut inner = self.inner.write().unwrap();
-        inner.chunks.push(chunk);
+    pub async fn append(&self, chunk: DataChunk) -> StorageResult<()> {
+        for (idx, column) in chunk.arrays().iter().enumerate() {
+            if let ArrayImpl::Int32(column) = column {
+                let column_path = self.column_path(idx);
+                let data = encode_int32_column(column)?;
+                tokio::fs::create_dir_all(column_path.parent().unwrap())
+                    .await
+                    .map_err(err)?;
+                tokio::fs::write(column_path, data).await.map_err(err)?;
+            } else {
+                return Err(anyhow!("unsupported column type").into());
+            }
+        }
         Ok(())
     }
 
     /// Get all chunks of the table.
-    ///
-    /// This interface will be deprecated soon in this tutorial.
-    pub fn all_chunks(&self) -> StorageResult<Vec<DataChunk>> {
-        let inner = self.inner.read().unwrap();
-        Ok(inner.chunks.clone())
+    pub async fn all_chunks(&self) -> StorageResult<Vec<DataChunk>> {
+        let mut columns = vec![];
+        for (idx, _) in self.column_descs.iter().enumerate() {
+            let column_path = self.column_path(idx);
+            let data = tokio::fs::read(column_path).await.map_err(err)?;
+            columns.push(decode_int32_column(&data)?);
+        }
+        Ok(vec![columns.into_iter().map(ArrayImpl::Int32).collect()])
     }
 }
