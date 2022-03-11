@@ -10,11 +10,6 @@ mod insert;
 mod select;
 mod values;
 
-use self::create::*;
-use self::insert::*;
-use self::select::*;
-use self::values::*;
-
 /// The error type of execution.
 #[derive(thiserror::Error, Debug)]
 pub enum ExecuteError {
@@ -22,44 +17,24 @@ pub enum ExecuteError {
     Storage(#[from] StorageError),
 }
 
-pub trait Executor {
-    fn execute(&mut self) -> Result<DataChunk, ExecuteError>;
-}
-
-/// A type-erased executor object.
-pub type BoxedExecutor = Box<dyn Executor>;
-
-/// The builder of executor.
-pub struct ExecutorBuilder {
+/// Execute the bound AST.
+pub struct Executor {
     catalog: CatalogRef,
     storage: StorageRef,
 }
 
-impl ExecutorBuilder {
-    /// Create a new executor builder.
-    pub fn new(catalog: CatalogRef, storage: StorageRef) -> ExecutorBuilder {
-        ExecutorBuilder { catalog, storage }
+impl Executor {
+    /// Create a new executor.
+    pub fn new(catalog: CatalogRef, storage: StorageRef) -> Executor {
+        Executor { catalog, storage }
     }
 
-    /// Build executor from a [BoundStatement].
-    pub fn build(&self, stmt: BoundStatement) -> BoxedExecutor {
+    /// Execute a bound statement.
+    pub fn execute(&self, stmt: BoundStatement) -> Result<DataChunk, ExecuteError> {
         match stmt {
-            BoundStatement::CreateTable(stmt) => Box::new(CreateTableExecutor {
-                stmt,
-                catalog: self.catalog.clone(),
-                storage: self.storage.clone(),
-            }),
-            BoundStatement::Insert(stmt) => Box::new(InsertExecutor {
-                table_ref_id: stmt.table_ref_id,
-                column_ids: stmt.column_ids,
-                catalog: self.catalog.clone(),
-                storage: self.storage.clone(),
-                child: Box::new(ValuesExecutor {
-                    column_types: stmt.column_types,
-                    values: stmt.values,
-                }),
-            }),
-            BoundStatement::Select(stmt) => Box::new(SelectExecutor { stmt }),
+            BoundStatement::CreateTable(stmt) => self.execute_create_table(stmt),
+            BoundStatement::Insert(stmt) => self.execute_insert(stmt),
+            BoundStatement::Select(stmt) => self.execute_select(stmt),
         }
     }
 }
