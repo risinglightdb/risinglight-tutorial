@@ -18,19 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
       - name: Install mdbook
-        run: cargo install mdbook mdbook-toc
+        run: |
+          wget https://github.com/rust-lang/mdBook/releases/download/v0.4.21/mdbook-v0.4.21-x86_64-unknown-linux-gnu.tar.gz -O ~/mdbook.tar.gz
+          tar xvf ~/mdbook.tar.gz -C ~
       - name: Build docs
         working-directory: ./docs
-        run: mdbook build
+        run: ~/mdbook build
       - name: Deploy to GitHub Pages
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_dir: ./docs/book
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
           force_orphan: true
