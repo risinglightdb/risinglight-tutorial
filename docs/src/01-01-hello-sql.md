@@ -56,7 +56,7 @@ SELECT 1        # 输入的 SQL 语句
 
 我们的 RisingLight 就使用了 sqllogictest 来做端到端测试。你可以在 [`code/sql`] 文件夹下找到每个任务对应的 sqllogictest 测试脚本。
 
-[`code/sql`]: https://github.com/singularity-data/risinglight-tutorial/tree/main/code/sql
+[`code/sql`]: https://github.com/risinglightdb/risinglight-tutorial/tree/main/code/sql
 
 ### Rust
 
@@ -88,7 +88,7 @@ Hello, world!
 
 除此之外，我们还要搭起一个端到端测试框架，能够运行第一个 sqllogictest 脚本：[`01-01.slt`]。
 
-[`01-01.slt`]: https://github.com/singularity-data/risinglight-tutorial/tree/main/code/sql/01-01.slt
+[`01-01.slt`]: https://github.com/risinglightdb/risinglight-tutorial/tree/main/code/sql/01-01.slt
 
 
 ## 整体设计
@@ -325,7 +325,7 @@ fn test() {
 [sqllogictest]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/
 [`DB`]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/trait.DB.html
 [`Runner`]: https://docs.rs/sqllogictest/0.1.0/sqllogictest/struct.Runner.html#method.run_script
-[test.rs]: https://github.com/singularity-data/risinglight-tutorial/tree/main/code/01-01/src/test.rs
+[test.rs]: https://github.com/risinglightdb/risinglight-tutorial/tree/main/code/01-01/src/test.rs
 
 ### 总结
 

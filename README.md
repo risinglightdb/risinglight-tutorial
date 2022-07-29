@@ -1,8 +1,14 @@
-# RisingLight Tutorial
+# [RisingLight Tutorial](https://risinglightdb.github.io/risinglight-tutorial)
 
-[![CI](https://github.com/singularity-data/risinglight-tutorial/workflows/CI/badge.svg?branch=main)](https://github.com/singularity-data/risinglight-tutorial/actions)
+🚧🚧🚧🚧🚧🚧🚧 UNDER CONSTRUCTION 🚧🚧🚧🚧🚧🚧🚧
 
-Let's build an OLAP database from scratch!
+[![CI](https://github.com/risinglightdb/risinglight-tutorial/workflows/CI/badge.svg?branch=main)](https://github.com/risinglightdb/risinglight-tutorial/actions)
+
+This repo contains a series of tutorial that help you build an OLAP database system like RisingLight. The tutorial is currently only offered in Simplified Chinese. Let's build an OLAP database from scratch!
+
+**[See it in Action!](https://risinglightdb.github.io/risinglight-tutorial)**
+
+View the [tracking issue](https://github.com/risinglightdb/risinglight-tutorial/issues/1) for the current progress.
 
 ## Building
 
