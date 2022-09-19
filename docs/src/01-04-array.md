@@ -108,9 +108,71 @@ DataChunk 是数据库执行引擎中对数据处理的基本单位。对于大�
 
 ## 整体设计
 
-一种可供参考的接口设计：
+一种可供参考的接口设计。：
 
 ```rust
+// Array
+pub trait Array: Sized + Send + Sync + 'static {
+    type Builder: ArrayBuilder<Array = Self>;
+    type Item: ToOwned + ?Sized;
+    fn get(&self, idx: usize) -> Option<&Self::Item>;
+    fn len(&self) -> usize;
+    fn iter(&self) -> ArrayIter<'_, Self> {
+        ArrayIter::new(self)
+    }
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+}
+
+pub trait ArrayBuilder: Send + Sync + 'static {
+    type Array: Array<Builder = Self>;
+    fn with_capacity(capacity: usize) -> Self;
+    fn push(&mut self, value: Option<&<Self::Array as Array>::Item>);
+    fn append(&mut self, other: &Self::Array);
+    fn finish(self) -> Self::Array;
+}
+
+pub trait Primitive:
+    PartialOrd + PartialEq + Debug + Copy + Send + Sync + Sized + Default + 'static
+{
+}
+
+pub struct PrimitiveArray<T: Primitive> {...}
+impl<T: Primitive> Array for PrimitiveArray<T> {...}
+
+pub struct PrimitiveArrayBuilder<T: Primitive> {...}
+impl<T: Primitive> ArrayBuilder for PrimitiveArrayBuilder<T> {...}
+
+pub struct Utf8Array { ... }
+impl Array for Utf8Array { ... }
+
+pub struct Utf8ArrayBuilder {...}
+impl ArrayBuilder for Utf8ArrayBuilder {...}
+
+pub type BoolArray = PrimitiveArray<bool>;
+pub type I32Array = PrimitiveArray<i32>;
+pub type F64Array = PrimitiveArray<f64>;
+
+pub enum ArrayImpl {
+    Bool(BoolArray),
+    Int32(I32Array),
+    Float64(F64Array),
+    Utf8(Utf8Array),
+}
+
+pub type BoolArrayBuilder = PrimitiveArrayBuilder<bool>;
+pub type I32ArrayBuilder = PrimitiveArrayBuilder<i32>;
+pub type F64ArrayBuilder = PrimitiveArrayBuilder<f64>;
+
+pub enum ArrayBuilderImpl {
+    Bool(BoolArrayBuilder),
+    Int32(I32ArrayBuilder),
+    F64(F64ArrayBuilder),
+    Utf8(Utf8ArrayBuilder),
+}
+
+// In-memory storage
 pub struct InMemoryStorage {...}
 
 impl InMemoryStorage {
