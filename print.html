@@ -1,0 +1,1099 @@
+<!DOCTYPE HTML>
+<html lang="cn" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>RisingLight Tutorial</title>
+        <meta name="robots" content="noindex" />
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="00-lets-build-a-database.html">RisingLight Tutorial</a></li><li class="chapter-item expanded "><a href="01-intro.html"><strong aria-hidden="true">1.</strong> 入门</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="01-01-hello-sql.html"><strong aria-hidden="true">1.1.</strong> Hello, SQL!</a></li><li class="chapter-item expanded "><a href="01-02-catalog.html"><strong aria-hidden="true">1.2.</strong> Catalog</a></li><li class="chapter-item expanded "><a href="01-03-create-table.html"><strong aria-hidden="true">1.3.</strong> 创建表（CREATE TABLE）</a></li><li class="chapter-item expanded "><a href="01-04-array.html"><strong aria-hidden="true">1.4.</strong> 内存存储</a></li><li class="chapter-item expanded "><a href="01-05-insert.html"><strong aria-hidden="true">1.5.</strong> 插入数据（INSERT）</a></li><li class="chapter-item expanded "><a href="01-06-planner.html"><strong aria-hidden="true">1.6.</strong> 执行计划</a></li><li class="chapter-item expanded "><a href="01-07-select.html"><strong aria-hidden="true">1.7.</strong> 查询数据（SELECT）</a></li><li class="chapter-item expanded "><a href="01-08-execution.html"><strong aria-hidden="true">1.8.</strong> 执行引擎</a></li></ol></li><li class="chapter-item expanded "><a href="02-query.html"><strong aria-hidden="true">2.</strong> 查询</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="02-01-operation.html"><strong aria-hidden="true">2.1.</strong> 算术运算（+-*/）</a></li><li class="chapter-item expanded "><a href="02-02-where.html"><strong aria-hidden="true">2.2.</strong> 条件查询（WHERE）</a></li><li class="chapter-item expanded "><a href="02-03-order.html"><strong aria-hidden="true">2.3.</strong> 排序（ORDER BY）</a></li><li class="chapter-item expanded "><a href="02-04-limit.html"><strong aria-hidden="true">2.4.</strong> 限制行数（LIMIT）</a></li><li class="chapter-item expanded "><a href="02-05-aggregation.html"><strong aria-hidden="true">2.5.</strong> 聚合（SUM）</a></li><li class="chapter-item expanded "><a href="02-06-group.html"><strong aria-hidden="true">2.6.</strong> 分组聚合（GROUP BY）</a></li><li class="chapter-item expanded "><a href="02-07-join.html"><strong aria-hidden="true">2.7.</strong> 连接（JOIN）</a></li><li class="chapter-item expanded "><a href="02-08-hash-join.html"><strong aria-hidden="true">2.8.</strong> 哈希连接（Hash Join）</a></li><li class="chapter-item expanded "><a href="02-09-copy.html"><strong aria-hidden="true">2.9.</strong> 导入数据（COPY）</a></li><li class="chapter-item expanded "><a href="02-10-tpch.html"><strong aria-hidden="true">2.10.</strong> TPC-H</a></li></ol></li><li class="chapter-item expanded "><a href="03-storage.html"><strong aria-hidden="true">3.</strong> 存储</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="03-01-memtable.html"><strong aria-hidden="true">3.1.</strong> Memtable</a></li><li class="chapter-item expanded "><a href="03-02-write.html"><strong aria-hidden="true">3.2.</strong> 编码与写入</a></li><li class="chapter-item expanded "><a href="03-03-manifest.html"><strong aria-hidden="true">3.3.</strong> Manifest</a></li><li class="chapter-item expanded "><a href="03-04-read.html"><strong aria-hidden="true">3.4.</strong> 读取</a></li><li class="chapter-item expanded "><a href="03-05-deletion.html"><strong aria-hidden="true">3.5.</strong> 删除</a></li><li class="chapter-item expanded "><a href="03-06-compaction.html"><strong aria-hidden="true">3.6.</strong> 合并</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">RisingLight Tutorial</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="risinglight-tutorial"><a class="header" href="#risinglight-tutorial">RisingLight Tutorial</a></h1>
+<p>RisingLight 是一个 Rust 语言编写的单机分析型（OLAP）数据库系统。</p>
+<p>在这个教程中，我们将会带领大家从零开始，一步一步地实现自己的数据库！
+从一个最简单的 SQL 解析器开始，逐步实现查询引擎、存储引擎、优化器和事务，最终能够运行工业级的 TPC-H 基准测试。</p>
+<p>除了标准教科书上的内容以外，你还可以体验到业界最前沿的流式计算引擎 lol。</p>
+<h2 id="为何要做这个教程"><a class="header" href="#为何要做这个教程">为何要做这个教程</a></h2>
+<p>随着数据库系统技术的快速发展（云原生数据库，HTAP一体化和智能化运维等），工业界对于数据库内核开发人员的需求与日俱增。
+对于尝试进入数据库系统领域的初学者，一个最大的挑战就是如何系统地了解数据库内核的并掌握数据库内核的开发能力。
+然而大多数高校的计算机本科数据库课程只会涉及SQL和数据库应用的相关知识，市面上讲解工业级数据库的书籍和文章也不适合初学者入门。
+虽然很多数据库系统课程有公开的课程项目，但这些项目往往是以“代码填空”的形式呈现给大家。
+著名的美国理论物理学家Richard Feynman曾经说过：&quot;What I cannot create, I do not understand&quot;。
+学习数据库系统内核的最佳方法无疑是自己从零实现一个迷你数据库系统，我们希望数据库系统领域的初学者，可以根据此教程实现自己的数据库系统
+，在了解数据库系统内核相关知识的同时提高自己的工程能力。并鼓励大家在未来为开源数据库系统（包括但不限于RisingLight和RisingWave）贡献自己的力量。</p>
+<h2 id="risinglight-世界地图"><a class="header" href="#risinglight-世界地图">RisingLight 世界地图</a></h2>
+<p><img src="img/worldmap.svg" alt="" /></p>
+<!-- 
+可以画成类似 DDIA 的样子
+ -->
+<h2 id="如何学习本教程"><a class="header" href="#如何学习本教程">如何学习本教程</a></h2>
+<p>正如你所见，整个 RisingLight 是一个广阔的开放世界！
+在这里你可以按照自己的兴趣，选择任意一种可行的路径来完成这个数据库的开发。
+当然如果你喜欢按部就班的节奏，我们也提供一条推荐的主线路径供大家参考。</p>
+<p>RisingLight 根据数据库中的不同方向，分成了若干小世界。它们整体上相对独立，但相互之间又有千丝万缕的关联。
+每个世界由很多小任务组成，在每个任务中我们会实现一个功能。而每个功能我们都会提供一系列的标准 SQL 语句作为测试，只要通过了全部测试就算完成了这个任务！</p>
+<p>例如在第一个任务中，我们提供的测试语句是：</p>
+<pre><code class="language-sql">SELECT 'Hello, world!'
+</code></pre>
+<p>它的期望输出是：</p>
+<pre><code>Hello, world!
+</code></pre>
+<p>只要你的程序对于给定的输入，能够给出正确的输出，我们就认为你正确实现了这一功能。</p>
+<p>这种方法叫做 <strong>端到端测试（End-to-End Testing）</strong>。你可以使用任何一种方法来通过测试，并且我们鼓励大家大开脑洞去尝试不同的实现方式。</p>
+<p>当然，在没有任何提示的情况下独立完成整个系统的设计与实现是相当困难的，但这也是对能力提高非常有帮助的。
+我们欢迎对自己能力有信心的大佬们来挑战这个 <strong>Hard 模式</strong>，收获更多经验值！</p>
+<p>对于其他同学来说，我们会带领大家完成系统的整体设计，提示一些关键的实现细节，并提供必要的框架代码，
+由同学们自行实现剩下的部分。这种是类似其它教程所采用的 <strong>Normal 模式</strong>。</p>
+<p>不过更为实际的情况是，在这个教程出来一段时间之后，社区中一定会涌现出大量的优秀作业供大家参考。
+考虑到这点，我们干脆直接公开每个任务的完整代码，官方提供《RisingLight 源码解析》。
+赶时间的朋友就不用亲自下场写代码了，直接来玩适合快速通关的 <strong>Easy 模式</strong> 吧。</p>
+<p>以上三种模式，同学们可以根据自己的情况，选择适合自己的方式来完成每个任务。
+需要提醒大家的是，付出和收获往往是成正比的，我们鼓励大家在力所能及的范围内去做更有挑战性的尝试。</p>
+<p>为了这种难度的区别，每个任务的文档会分为以下几个部分：</p>
+<ol>
+<li>背景知识：介绍完成任务所必须掌握的知识，提供参考资料</li>
+<li>任务目标：描述任务需要完成的内容，需要通过的测试</li>
+<li>整体设计：介绍代码框架和需要注意的细节</li>
+<li>源码解析：详细介绍实现代码</li>
+</ol>
+<p>如果你想挑战 Hard，那么看到 2 就可以开始动手了；如果你选择 Normal，那么还可以继续看完 3；而如果你是 Easy 玩家，那就看完全部文档吧！</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="入门"><a class="header" href="#入门">入门</a></h1>
+<p>欢迎来到新手村！</p>
+<p>在这里我们将白手起家，构建出一个能够运行简单 SQL 语句的数据库框架。
+在此过程中，我们会从一个 SQL 解析器开始，逐步引入查询引擎所需的各个模块。
+最终实现数据库的 3 条基本命令：创建 <code>CREATE</code>，插入 <code>INSERT</code> 和查找 <code>SELECT</code>。</p>
+<h2 id="世界地图"><a class="header" href="#世界地图">世界地图</a></h2>
+<p><img src="img/world1.svg" alt="" /></p>
+<ol>
+<li>
+<p>Hello SQL：实现最简单的 SQL 解释器。</p>
+</li>
+<li>
+<p>Catalog：定义 Catalog 相关数据结构。</p>
+</li>
+<li>
+<p>创建表：实现 Binder。支持 <code>CREATE TABLE</code> 语句。</p>
+</li>
+<li>
+<p>内存存储：实现分析型数据库特有的列式存储数据结构。</p>
+</li>
+<li>
+<p>插入数据：向表中插入数据，支持 <code>INSERT VALUES</code> 语句。</p>
+</li>
+<li>
+<p>执行计划：实现执行计划树，支持 <code>EXPLAIN</code> 语句。</p>
+</li>
+<li>
+<p>查询数据：从表中读取数据，支持 <code>SELECT v FROM t</code> 语句。</p>
+</li>
+<li>
+<p>执行引擎：实现向量化模型的执行引擎。</p>
+</li>
+</ol>
+<p>除此之外，还有以下小练习：</p>
+<ol>
+<li>
+<p>删除表：支持 <code>DROP TABLE</code> 语句。</p>
+</li>
+<li>
+<p>创建 Schema：支持 <code>CREATE SCHEMA</code> 语句。</p>
+</li>
+</ol>
+<p>从新手村成功毕业以后，我们就有了探索其他世界所需的代码基础。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hello-sql"><a class="header" href="#hello-sql">Hello, SQL!</a></h1>
+<p>作为万里长征的第一步，在这个任务中我们会构建起 RisingLight 数据库的基本框架，并且使它能够运行最简单的 SQL 语句。</p>
+<!-- toc -->
+<h2 id="背景知识"><a class="header" href="#背景知识">背景知识</a></h2>
+<h3 id="数据库"><a class="header" href="#数据库">数据库</a></h3>
+<p>数据库是结构化数据的有组织集合。它通常是大部分应用存储数据的核心组件。</p>
+<p>针对不同的应用场景，数据库演化出了非常多的类型。按数据模型来分，有传统的关系数据库、对象、文档、KV、图、流、时序数据库等。
+按业务特点来分，则主要有事务型（OLTP）和分析型（OLAP）两种。其中前者以增删改为主，后者以查询为主。
+他们内部的区别主要体现在存储格式上：事务型一般采用按行存储，而分析型则采用列式存储。</p>
+<p>我们的 RisingLight 是一个简单的分析型关系数据库。</p>
+<h3 id="sql"><a class="header" href="#sql">SQL</a></h3>
+<p>SQL 是数据库领域最流行的编程语言。它的全称是 Structured Query Language（结构化查询语言），用来访问和处理数据库中的数据。</p>
+<p>SQL 语言的背后是 <strong>关系代数</strong> 模型，具有非常坚实的理论基础。</p>
+<p>关于 SQL 语言的更多介绍可以参考 <a href="https://15445.courses.cs.cmu.edu/fall2021/schedule.html">CMU 15-445</a> Lecture 01/02 的相关内容。</p>
+<p>由于 SQL 在数据库中的广泛应用，我们的 RisingLight 也采用 SQL 作为操作数据库的唯一接口，并且后续会以 SQL 语言特性为导向进行相关功能的开发。</p>
+<h3 id="duckdb"><a class="header" href="#duckdb">DuckDB</a></h3>
+<p><a href="https://duckdb.org">DuckDB</a> 是一个轻量级嵌入式分析型数据库，可以类比作 OLAP 领域的 SQLite。</p>
+<p>你可以按照<a href="https://duckdb.org/docs/installation/">这里</a>的说明下载安装 DuckDB，然后在其中输入 SQL 命令进行体验。</p>
+<p>RisingLight 的功能定位和 DuckDB 很相似，并且一定程度上参考了 DuckDB 的设计与实现。
+如果大家在实现数据库的过程中遇到困难，那么 DuckDB 是一个很好的学习和参考对象。</p>
+<h3 id="sqllogictest"><a class="header" href="#sqllogictest">SqlLogicTest</a></h3>
+<p><a href="https://www.sqlite.org/sqllogictest/doc/trunk/about.wiki">SqlLogicTest</a> 是一个检验数据库执行结果正确性的测试框架，最早被用来测试 SQLite。它定义了一种脚本语言来描述 SQL 测试语句和期望输出结果。</p>
+<p>以一个最简单的测试为例：</p>
+<pre><code>query I         # query 表示查询，I 表示期望输出是一个整数
+SELECT 1        # 输入的 SQL 语句
+----            # 分隔符，接下来描述期望结果
+1               # 期望输出 1，测试器会检查它和数据库输出的字符串是否一致
+</code></pre>
+<p>我们的 RisingLight 就使用了 sqllogictest 来做端到端测试。你可以在 <a href="https://github.com/risinglightdb/risinglight-tutorial/tree/main/code/sql"><code>code/sql</code></a> 文件夹下找到每个任务对应的 sqllogictest 测试脚本。</p>
+<h3 id="rust"><a class="header" href="#rust">Rust</a></h3>
+<p>RisingLight 使用 Rust 语言编写！</p>
+<p><a href="https://www.rust-lang.org">Rust</a> 是新时代的系统级编程语言，主要为了解决 C/C++ 中的内存安全问题而生。
+Rust 在不使用垃圾回收的前提下，通过引入所有权和生命周期等机制在编译期保证程序不会非法使用内存，让程序既运行高效又安全可靠。
+这使得它成为编写数据库系统的很好选择。</p>
+<p>然而凡事都有两面，Rust 严格的语言机制使得它具有很高的学习门槛。并且一些在其它 OOP 语言中能轻而易举完成的操作，到了 Rust 中就很难实现。
+我们在编写 RisingLight 的过程中也遇到了这些问题，在后面的章节中我们也会具体介绍应该如何处理或绕过它们。</p>
+<p>整体来讲，使用 Rust 编写数据库能为我们带来很多好处。大家在后面的 coding 过程中可以亲自体会！</p>
+<h2 id="任务目标"><a class="header" href="#任务目标">任务目标</a></h2>
+<p>简单介绍完了背景知识，下面我们就可以开始动手了！</p>
+<p>在第一个任务中你需要从零开始搭起一个最简单的数据库框架。它需要提供一个可交互的终端，能够接收用户输入的 SQL 语句并输出结果：</p>
+<pre><code class="language-sql">&gt; SELECT 'Hello, world!'
+Hello, world!
+</code></pre>
+<p>这就是我们要支持的第一个 SQL 命令：<code>SELECT</code> 一个常数，然后输出它：）</p>
+<p>除此之外，我们还要搭起一个端到端测试框架，能够运行第一个 sqllogictest 脚本：<a href="https://github.com/risinglightdb/risinglight-tutorial/tree/main/code/sql/01-01.slt"><code>01-01.slt</code></a>。</p>
+<h2 id="整体设计"><a class="header" href="#整体设计">整体设计</a></h2>
+<p>为了完成上面的目标，我们需要实现四个简单的模块：</p>
+<ul>
+<li>Parser：负责解析 SQL 语句并生成抽象语法树（AST）</li>
+<li>Executor：负责执行解析后的 SQL 语句</li>
+<li>Shell：一个可交互的命令行终端</li>
+<li>Test：一个基于 sqllogictest 脚本的测试框架</li>
+</ul>
+<p>它们之间的关系如图所示：</p>
+<p><img src="img/01-01-mod.svg" alt="" /></p>
+<p>我们可以把它们实现到不同的文件里：</p>
+<pre><code>src
+├── parser.rs
+├── executor.rs
+├── lib.rs
+├── main.rs
+└── test.rs
+</code></pre>
+<p>其中 lib 是数据库本体，会被编译成一个程序库。main 是 <code>cargo run</code> 运行的可执行文件，test 是 <code>cargo test</code> 运行的测试。</p>
+<h3 id="parser"><a class="header" href="#parser">Parser</a></h3>
+<p>为了读懂用户输入的 SQL 命令，你首先需要一个 SQL 解析器（Parser）。对于上面这条 SQL 语句来说，自己手写一个字符串解析就足够了。
+不过随着之后 SQL 语句越来越复杂，解析 SQL 的复杂度也会与日俱增。既然我们又不是编译原理课，Parser 并不是我们关注的重点，
+因此在 RisingLight 中我们推荐大家使用第三方库 <a href="https://github.com/sqlparser-rs/sqlparser-rs">sqlparser-rs</a> 来完成 SQL 解析的工作，具体用法可以参考它的<a href="https://docs.rs/sqlparser/0.13.0/sqlparser/">文档</a>。</p>
+<p>简单来说，我们可以创建一个 <a href="https://docs.rs/sqlparser/0.13.0/sqlparser/parser/struct.Parser.html"><code>Parser</code></a> 对象，然后使用 <a href="https://docs.rs/sqlparser/0.13.0/sqlparser/parser/struct.Parser.html#method.parse_sql"><code>parse_sql</code></a> 方法将字符串解析成一颗抽象语法树（AST）。
+抽象语法树的各个节点定义在 <a href="https://docs.rs/sqlparser/0.13.0/sqlparser/ast/index.html"><code>ast</code></a> 模块中，我们可以从根节点 <a href="https://docs.rs/sqlparser/0.13.0/sqlparser/ast/enum.Statement.html"><code>Statement</code></a> 开始，一级一级地查看里面的内容。</p>
+<p>当我们要实现解析某种特定的 SQL 语句时，一个好办法是直接 debug 输出解析后 AST 的完整结构，观察我们想要的东西分别被解析到了哪个位置上，然后在代码中提取相应的内容。</p>
+<pre><pre class="playground"><code class="language-rust no_run">use sqlparser::dialect::PostgreSqlDialect;
+use sqlparser::parser::Parser;
+
+fn main() {
+    let mut sql = String::new();
+    std::io::stdin().read_line(&amp;mut sql).unwrap();
+    let stmts = Parser::parse_sql(&amp;PostgreSqlDialect {}, &amp;sql);
+    println!(&quot;{:#?}&quot;, stmts);
+}
+</code></pre></pre>
+<p>例如我们使用上述代码，输入 <code>SELECT 'Hello, world!'</code>，就会得到以下输出：</p>
+<pre><code>Ok(
+    [
+        Query(
+            Query {
+                with: None,
+                body: Select(
+                    Select {
+                        distinct: false,
+                        top: None,
+                        projection: [
+                            UnnamedExpr(
+                                Value(
+                                    SingleQuotedString(
+                                        &quot;Hello, world!&quot;,
+                                    ),
+                                ),
+                            ),
+                        ],
+                        from: [],
+                        lateral_views: [],
+                        selection: None,
+                        group_by: [],
+                        cluster_by: [],
+                        distribute_by: [],
+                        sort_by: [],
+                        having: None,
+                    },
+                ),
+                order_by: [],
+                limit: None,
+                offset: None,
+                fetch: None,
+            },
+        ),
+    ],
+)
+</code></pre>
+<h3 id="executor"><a class="header" href="#executor">Executor</a></h3>
+<p>在完成 SQL 解析得到抽象语法树后，我们就可以根据 SQL 的语义来执行它。</p>
+<p>对于 <code>SELECT 'Hello, world!'</code> 来说，你只需要根据上面的结构，逐级提取出 <code>&quot;Hello, world!&quot;</code> 字符串即可：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use sqlparser::{SetExpr, Statement};
+
+match stmt {
+    Statement::Query(query) =&gt; match &amp;query.body {
+        SetExpr::Select(select) =&gt; {
+            // ...
+        }
+        _ =&gt; todo!(&quot;not supported statement: {:#?}&quot;, stmt),
+    },
+    _ =&gt; todo!(&quot;not supported statement: {:#?}&quot;, stmt),
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>随着之后 SQL 语句变得越来越复杂，我们会在 Parser 和 Executor 之间加入更多的模块。来处理变量绑定和调整执行计划。</p>
+<h3 id="错误处理"><a class="header" href="#错误处理">错误处理</a></h3>
+<p>目前为止我们只关注了程序正常执行的情况，但在实际环境下数据库中可能出现各种各样的错误，最常见的比如用户输入了不合法的 SQL 语句。
+在开发初期遇到这种情况时，我们可以简单粗暴地直接 panic 中止程序。但是一个合格的程序应该向用户报告错误，而不影响自身正常运行：</p>
+<pre><code>&gt; SELET 1
+parse error: Expected an SQL statement, found: SELET
+&gt; |
+</code></pre>
+<p>Rust 语言中没有 <code>throw-catch</code> 的异常机制，而是通过返回 <code>Result</code> 类型来处理错误。
+目前在 Rust 生态中错误处理的最佳实践是使用 <a href="https://docs.rs/thiserror/1.0.30/thiserror/index.html">thiserror</a> 库来定义错误类型。</p>
+<p>在我们的数据库中，每个模块都可能发生一些错误。例如 Parser 模块会返回 sqlparser 定义的 <a href="https://docs.rs/sqlparser/0.13.0/sqlparser/parser/enum.ParserError.html">ParserError</a>，Executor 未来可能在读写文件时返回标准库定义的 <code>std::io::Error</code>。
+而在实现顶层结构时，就需要定义一种 Error 类型把它们聚合起来。我们推荐大家使用下面的风格来实现它：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub use sqlparser::parser::ParserError;
+
+/// The error type of execution.
+#[derive(thiserror::Error, Debug)]
+pub enum ExecuteError {
+    // ...
+}
+
+/// The error type of database operations.
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+    #[error(&quot;parse error: {0}&quot;)]
+    Parse(#[from] ParserError),
+    #[error(&quot;execute error: {0}&quot;)]
+    Execute(#[from] ExecuteError),
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>这样，每个模块都返回自己定义的错误类型，在顶层模块中使用 <code>?</code> 就可以完成自动类型转换：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>mod parser {
+    pub fn parse(sql: &amp;str) -&gt; Result&lt;..., ParserError&gt; {...}
+}
+mod executor {
+    pub fn execute(...) -&gt; Result&lt;..., ExecuteError&gt; {...}
+}
+
+fn run(sql: &amp;str) -&gt; Result&lt;..., Error&gt; {
+    let stmt = parser::parse(sql)?;
+    let output = executor::execute(stmt)?;
+    Ok(output)
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h3 id="shell"><a class="header" href="#shell">Shell</a></h3>
+<p>实现一个朴素的可交互终端非常简单，只需使用标准库提供的 <code>stdin</code> 输入，<code>println!</code> 宏输出即可。</p>
+<p>但是，一个对用户友好的终端一般还需要支持光标移动和历史记录等功能
+（如果你使用 stdin 读取用户输入，那么在按上下左右键时会出现一些奇怪的控制字符）。
+而自己实现这些未免枯燥乏味，因此我们也可以使用第三方库 <a href="https://docs.rs/rustyline/9.1.1/rustyline/">rustyline</a> 来帮我们解决这个问题。</p>
+<p>一个简单的用法如下：</p>
+<pre><pre class="playground"><code class="language-rust no_run">fn main() {
+    let mut rl = rustyline::Editor::&lt;()&gt;::new();
+    loop {
+        match rl.readline(&quot;&gt; &quot;) {
+            Ok(line) =&gt; {
+                rl.add_history_entry(&amp;line);
+                println!(&quot;Line: {:?}&quot;, line);
+            }
+            Err(ReadlineError::Interrupted) =&gt; {}
+            Err(ReadlineError::Eof) =&gt; break,
+            Err(err) =&gt; println!(&quot;Error: {:?}&quot;, err),
+        }
+    }
+}
+</code></pre></pre>
+<h3 id="test"><a class="header" href="#test">Test</a></h3>
+<p>测试是系统开发中的重要环节。
+这部分我们实现了自己的 <a href="https://www.sqlite.org/sqllogictest/doc/trunk/about.wiki">sqllogictest</a> 库来做测试脚本的解析和运行。</p>
+<p>你只需实现一个 Database struct，并为它实现 <a href="https://docs.rs/sqllogictest/0.1.0/sqllogictest/trait.DB.html"><code>DB</code></a> trait。然后就可以使用 <a href="https://docs.rs/sqllogictest/0.1.0/sqllogictest/struct.Runner.html#method.run_script"><code>Runner</code></a> 来运行测试了：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl sqllogictest::DB for Database {
+    type Error = Error;
+    fn run(&amp;self, sql: &amp;str) -&gt; Result&lt;String, Self::Error&gt; {...}
+}
+
+#[test]
+fn test() {
+    let script = std::fs::read_to_string(Path::new(&quot;../sql/01-01.slt&quot;).unwrap();
+    let mut tester = sqllogictest::Runner::new(Database::new());
+    tester.run_script(&amp;script);
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>我们提供了一份完整的测试框架代码 <a href="https://github.com/risinglightdb/risinglight-tutorial/tree/main/code/01-01/src/test.rs">test.rs</a>，你可以直接把它复制到你的项目中。</p>
+<p>在运行测试时，你可以开启 <code>RUST_LOG=info</code> 和 <code>RUST_BACKTRACE=1</code> 这两个环境变量。开启这两个选项可以方便定位运行过程的错误。</p>
+<h3 id="总结"><a class="header" href="#总结">总结</a></h3>
+<p>以上我们介绍了实现一个最简单数据库框架所需的四个模块，每个模块的实现思路和值得关注的问题。
+在每个模块中我们都使用了一个第三方库来快速实现某种功能，这也是 Rust 语言生态的一大优势。</p>
+<p>下一步我们将实现 Catalog，为数据定义它的结构，从而为建表和插入做准备。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="catalog"><a class="header" href="#catalog">Catalog</a></h1>
+<p>关系型数据库存储<strong>结构化</strong>的数据。其中有一部分描述这些结构的“元数据”就被称为 Catalog。
+在这个任务中我们将学习关系数据库的基本模型，为数据库定义好 Catalog 相关的数据结构，从而为后面插入数据做准备。</p>
+<!-- toc -->
+<h2 id="背景知识-1"><a class="header" href="#背景知识-1">背景知识</a></h2>
+<p>数据库中包含了各种各样的对象。</p>
+<h3 id="表table"><a class="header" href="#表table">表（Table）</a></h3>
+<p>我们最熟悉的对象是 <strong>表（Table）</strong>，它是关系型数据库中存储数据的基本单位。</p>
+<p>一张表可以理解为一个<strong>二维数组</strong>，它由纵向的<strong>列</strong>和横向的<strong>行</strong>组成。
+每一列表示数据的某种<strong>属性（Attribute）</strong>，每一行则表示一条数据<strong>记录（Record）</strong>。</p>
+<p>例如下面展示了一个简单的记录学生信息的表：</p>
+<div class="table-wrapper"><table><thead><tr><th>id</th><th>name</th><th>age</th></tr></thead><tbody>
+<tr><td>1</td><td>Alice</td><td>18</td></tr>
+<tr><td>2</td><td>Bob</td><td>19</td></tr>
+<tr><td>3</td><td>Eve</td><td>17</td></tr>
+</tbody></table>
+</div>
+<p>在偏理论的语境下，表还有一个更正式的名字叫做 <strong>关系（Relation）</strong>，因为它蕴含了数据属性之间的关系。
+其中，每一行又被称为 <strong>元组（Tuple）</strong>。</p>
+<p><img src="img/01-02-relational_database_terms.svg" alt="" /></p>
+<p>表中的每一列都有自己的名字和类型。比如在上面的表中，第一列的名字是 <code>id</code>，数据类型是 <code>INTEGER</code>（整数）。而第二列的数据类型是 <code>VARCHAR</code>（字符串）。</p>
+<p>各种数据库都会支持大量的数据类型，其中比较常见的有下面几种：</p>
+<ul>
+<li><code>INTEGER</code>：有符号整数</li>
+<li><code>DOUBLE</code>：浮点数</li>
+<li><code>CHAR</code>：定长字符串</li>
+<li><code>VARCHAR</code>：变长字符串</li>
+<li><code>DECIMAL</code>：十进制定点数，用来做无误差的精确运算（常用在交易系统中表示账户金额）</li>
+<li><code>DATE</code>：日期和时间</li>
+</ul>
+<p>部分类型还可以有自己的关联参数，例如：</p>
+<ul>
+<li><code>CHAR(n)</code> 表示长度为 <code>n</code> 的字符串</li>
+<li><code>VARCHAR(n)</code> 表示最大长度为 <code>n</code> 的字符串</li>
+<li><code>DECIMAL(m, d)</code> 表示有效数字 <code>m</code> 位、小数点后 <code>d</code> 位的定点数。 </li>
+</ul>
+<p>表中每一列的数据都只能存储指定的类型，他们所有合法值的集合称为 <strong>数据域（Data Domain）</strong>。
+在一般情况下，所有数据域都包含一个特殊的 <strong>空值 <code>NULL</code></strong>。也就是说，表中的每个位置默认都可以为空。</p>
+<p>除了名字和类型以外，每一列还有一些可选的属性：</p>
+<ul>
+<li>
+<p><strong>非空</strong> <code>NOT NULL</code>：表示这一列的值不能为 <code>NULL</code>。</p>
+</li>
+<li>
+<p><strong>唯一</strong> <code>UNIQUE</code>：表示这一列的值不能重复。</p>
+</li>
+<li>
+<p><strong>主键</strong> <code>PRIMARY KEY</code>：主键能够唯一地表示表中的一行，一般用来作为索引。</p>
+<p>因此主键一定是唯一且非空的，并且每个表只能有一个主键。例如在上面的学生表中，<code>id</code> 就可以作为主键。</p>
+</li>
+</ul>
+<p>在 SQL 语言中，<strong>数据定义语言（Data Definition Language，DDL）</strong> 可以用来描述一个表的模式信息。
+比如上面的学生表就可以通过以下语句来定义：</p>
+<pre><code class="language-sql">CREATE TABLE student (
+    id      INTEGER PRIMARY KEY,
+    name    VARCHAR NOT NULL,
+    age     INTEGER
+);
+</code></pre>
+<p>我们会在下一个任务中具体实现它：）</p>
+<h3 id="视图view"><a class="header" href="#视图view">视图（View）</a></h3>
+<p><strong>视图（View）</strong> 是一种虚拟的表，它表示一条 SQL 语句的查询结果。每次查看视图时，数据库都会执行一遍查询以获取最新的结果。</p>
+<p>例如，我们可以用 DDL 创建一个关于学生名字的视图：</p>
+<pre><code class="language-sql">CREATE VIEW student_name AS
+SELECT name FROM student;
+</code></pre>
+<p>类似地还有另一个概念叫做 <strong>物化视图（Materialized view）</strong>。它将查询结果缓存下来，并在特定时期进行更新。</p>
+<h3 id="索引index"><a class="header" href="#索引index">索引（Index）</a></h3>
+<p><strong>索引（Index）</strong> 是对数据库中某一列或多列数据进行排序的结构，用来快速查询表中的记录。</p>
+<p>关系型数据库一般会对主键自动创建索引。如果还有其它的列需要大量随机访问或范围查询，就可以手动为它们创建索引来加速。
+例如，我们可以用 DDL 创建学生名字的索引：</p>
+<pre><code class="language-sql">CREATE INDEX student_name ON student (name);
+</code></pre>
+<p>索引的经典实现是 B+ 树，这是一种适合存储在磁盘上的平衡树。</p>
+<p>由于它的实现比较复杂，因此在 RisingLight 中我们暂时不会涉及索引。</p>
+<!-- 以后可以加上？ -->
+<h3 id="模式schema"><a class="header" href="#模式schema">模式（Schema）</a></h3>
+<p><strong>模式（Schema）</strong> 是数据库对象的集合。上面提到的表、视图、索引等都可以被包含在一个 Schema 当中。
+对于有用户权限的数据库系统，在 Schema 上可以指定不同的用户权限。</p>
+<p>在 DDL 中我们可以先创建一个 Schema，然后在这个 Schema 内部创建其它对象：</p>
+<pre><code class="language-sql">CREATE SCHEMA school;
+CREATE TABLE school.student (...);
+</code></pre>
+<p>部分数据库（比如 Postgres）在 Schema 之上还有一个层级 <strong>Database</strong>，一个 Database 可以包含多个 Schema。
+不过其它大部分数据库都没有这个额外的层级：在 MySQL 中 <code>DATABASE</code> 和 <code>SCHEMA</code> 是同义词，在 SQLite 或 DuckDB 这类简单的嵌入式数据库中则不存在 <code>DATABASE</code> 这个关键词。</p>
+<p>总的来看，一个数据库内部对象的层次结构可以表示成这样的一棵树：</p>
+<p><img src="img/01-02-hierarchy.svg" alt="" /></p>
+<p>当前任务的目标就是实现描述它的数据结构。</p>
+<h2 id="任务目标-1"><a class="header" href="#任务目标-1">任务目标</a></h2>
+<p>实现 Catalog 相关数据结构，包括：Database，Schema，Table，Column 四个层级。</p>
+<p>能够准确描述上面提到的这种表：</p>
+<pre><code class="language-sql">CREATE TABLE student (
+    id      INTEGER PRIMARY KEY,
+    name    VARCHAR NOT NULL,
+    age     INTEGER
+);
+</code></pre>
+<p>除此之外，这个任务没有新增的 SQL 测试。</p>
+<h2 id="整体设计-1"><a class="header" href="#整体设计-1">整体设计</a></h2>
+<p>首先，我们提供一种可供参考的接口设计：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// 整个数据库的 Catalog 根节点
+pub struct DatabaseCatalog {...}
+
+impl DatabaseCatalog {
+    pub fn add_schema(&amp;self, name: &amp;str) -&gt; SchemaId {...}
+    pub fn get_schema(&amp;self, id: SchemaId) -&gt; Option&lt;Arc&lt;SchemaCatalog&gt;&gt; {...}
+    pub fn del_schema(&amp;self, id: SchemaId) {...}
+}
+
+// 一个 Schema 的 Catalog
+pub struct SchemaCatalog {...}
+
+impl SchemaCatalog {
+    pub fn id(&amp;self) -&gt; SchemaId {...}
+    pub fn name(&amp;self) -&gt; String {...}
+    pub fn add_table(&amp;self, name: &amp;str, columns: &amp;[(String, ColumnDesc)]) -&gt; TableId {...}
+    pub fn get_table(&amp;self, id: TableId) -&gt; Option&lt;Arc&lt;TableCatalog&gt;&gt; {...}
+    pub fn del_table(&amp;self, id: TableId) {...}
+}
+
+// 一个表的 Catalog
+pub struct TableCatalog {...}
+
+impl TableCatalog {
+    pub fn id(&amp;self) -&gt; TableId {...}
+    pub fn name(&amp;self) -&gt; String {...}
+    pub fn get_column(&amp;self, id: ColumnId) -&gt; Option&lt;Arc&lt;ColumnCatalog&gt;&gt; {...}
+    pub fn all_columns(&amp;self) -&gt; Vec&lt;Arc&lt;ColumnCatalog&gt;&gt; {...}
+}
+
+// 一个列的 Catalog
+pub struct ColumnCatalog {...}
+
+impl ColumnCatalog {
+    pub fn id(&amp;self) -&gt; ColumnId {...}
+    pub fn name(&amp;self) -&gt; String {...}
+    pub fn desc(&amp;self) -&gt; ColumnDesc {...}
+}
+
+// 一个列的完整属性
+pub struct ColumnDesc {...}
+
+impl ColumnDesc {
+    pub fn is_nullable(&amp;self) -&gt; bool {...}
+    pub fn is_primary(&amp;self) -&gt; bool {...}
+    pub fn datatype(&amp;self) -&gt; DataType {...}
+}
+
+// 一个列的数据类型，包含了“可空”信息
+pub struct DataType {...}
+
+impl DataType {
+    pub fn is_nullable(&amp;self) -&gt; bool {...}
+    pub fn kind(&amp;self) -&gt; DataTypeKind {...}
+}
+
+// 一个值的数据类型，不考虑空值
+// 为了方便，我们可以直接使用 sqlparser 中定义的类型
+pub use sqlparser::ast::DataType as DataTypeKind;
+<span class="boring">}
+</span></code></pre></pre>
+<p>为了代码结构清晰，可以把它们拆成多个文件：</p>
+<pre><code>src
+├── catalog
+│   ├── mod.rs
+│   ├── database.rs
+│   ├── schema.rs
+│   ├── table.rs
+│   └── column.rs
+├── types.rs
+...
+</code></pre>
+<p>由于 Catalog 会在数据库中多个地方被读取或修改，因此我们把它们设计为 可被共享访问 的数据结构（Send + Sync）。
+这种 struct 的一个特点就是所有方法都标记 <code>&amp;self</code> 而不是 <code>&amp;mut self</code>，即使对于修改操作也不例外。
+这种模式在 Rust 中被称为 <strong><a href="https://kaisery.github.io/trpl-zh-cn/ch15-05-interior-mutability.html">内部可变性</a></strong>。</p>
+<p>实现这种模式通常需要定义两层 struct：内层是普通的可变结构，然后在外面包一层锁。</p>
+<p>以顶层的 <code>DatabaseCatalog</code> 为例：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::sync::Mutex;
+
+// 外部 Sync 结构
+pub struct DatabaseCatalog {
+    inner: Mutex&lt;Inner&gt;,    // 对于读多写少的场景，也可以使用 RwLock
+}
+
+// 内部可变结构
+struct Inner {
+    schemas: HashMap&lt;SchemaId, Arc&lt;SchemaCatalog&gt;&gt;,
+    // ...
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>当我们为外层结构实现方法的时候，需要先 lock 住内部结构，然后去访问 inner：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl DatabaseCatalog {
+    pub fn get_schema(&amp;self, schema_id: SchemaId) -&gt; Option&lt;Arc&lt;SchemaCatalog&gt;&gt; {
+        let inner = self.inner.lock().unwrap();
+        inner.schemas.get(&amp;schema_id).cloned()
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>如果函数体过于复杂，也可以把它拆成多个 Inner 对象上的小函数：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl DatabaseCatalog {
+    pub fn add_schema(&amp;self, name: &amp;str) {
+        let inner = self.inner.lock().unwrap();
+        let id = inner.next_id();
+        inner.add_schema(id, name);
+    }
+}
+
+impl Inner {
+    fn add_schema(&amp;mut self, schema_id: SchemaId, name: &amp;str) {...}
+    fn next_id(&amp;mut self) -&gt; SchemaId {...}
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>主要的技巧就是这些，代码本身并不复杂。下一步我们就会基于这里定义的数据结构，来实现 <code>CREATE TABLE</code> 创建表操作了！</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="创建表create-table"><a class="header" href="#创建表create-table">创建表（<code>CREATE TABLE</code>）</a></h1>
+<p>在实现了 Catalog 之后，我们就可以使用 <code>CREATE TABLE</code> 语句创建数据表：</p>
+<pre><code class="language-sql">CREATE TABLE student (
+    id      INTEGER PRIMARY KEY,
+    name    VARCHAR NOT NULL,
+    age     INTEGER
+);
+</code></pre>
+<p>这一语句除了解析和执行两个步骤以外，还需要做名称的检查，并将它们与数据库内部对象绑定起来。
+这些工作一般是由一个叫做 Binder 的模块完成。</p>
+<p>在此任务中，我们将实现一个基础的 Binder，同时拓展 Executor 实现相应的执行逻辑，最终支持 <code>CREATE TABLE</code> 语句。</p>
+<!-- toc -->
+<h2 id="背景知识-2"><a class="header" href="#背景知识-2">背景知识</a></h2>
+<h3 id="binder"><a class="header" href="#binder">Binder</a></h3>
+<p>Binder 是整个数据库系统中一个不太起眼但又十分重要的模块。</p>
+<p>它的作用是将解析后生成的 AST 和 Schema 信息绑定起来，具体包括：</p>
+<ul>
+<li>检查输入的名称是否合法、是否有重复、有歧义</li>
+<li>推断表达式的返回值类型，并检查是否合法</li>
+<li>将输入的名称转换成内部 ID</li>
+</ul>
+<p>比如，对于一个简单的创建表的命令：</p>
+<pre><code class="language-sql">CREATE TABLE student (
+    id      INTEGER PRIMARY KEY,
+    name    VARCHAR NOT NULL,
+    age     INTEGER
+);
+</code></pre>
+<p>Binder 会依次完成以下工作：</p>
+<ol>
+<li>由于 SQL 对大小写不敏感，Binder 会首先将所有名称统一成小写。</li>
+<li>对于表名 <code>student</code>，自动补全省略的 schema 名。假如当前 schema 是 <code>school</code>，那么会将其补全成 <code>school.student</code>。</li>
+<li>检查 schema 是否存在，并获取它的 Schema ID。</li>
+<li>检查 schema 中是否已经存在名为 <code>student</code> 的表。</li>
+<li>检查列名 <code>id</code> <code>name</code> <code>age</code> 是否合法、是否有重复。</li>
+<li>检查列的属性是否合法，例如不能出现两个 <code>PRIMARY KEY</code>。</li>
+<li>向 AST 中填入绑定后的信息：Schema ID。</li>
+</ol>
+<p>对于插入数据的 <code>INSERT</code> 语句，例如：</p>
+<pre><code class="language-sql">INSERT INTO student VALUES (1, 'Alice', 18)
+</code></pre>
+<p>Binder 需要查询表中每一列的信息，推断表达式的类型，并检查它们是否相符。
+换言之，Binder 应该能够识别出以下不合法的插入语句：</p>
+<pre><code class="language-sql">INSERT INTO student VALUES (1)                  -- 存在未指定的 NOT NULL 值
+INSERT INTO student VALUES (1, 'Alice', 'old')  -- 类型不匹配
+INSERT INTO student VALUES (1, 'Alice', 18+'g') -- 表达式类型不匹配
+</code></pre>
+<p>对于更复杂的嵌套查询语句，Binder 还需要根据当前语境，推断出每个名称具体指代哪个对象：</p>
+<pre><code class="language-sql">SELECT name FROM student WHERE sid IN (
+--                  ^-----------^ student.sid
+    SELECT sid FROM enrolled WHERE class = 'database'
+--          ^----------^ enrolled.sid
+)
+</code></pre>
+<p>可以看出，Binder 干的都是一些比较繁琐的脏活累活。因此后面我们写的 Binder 代码也会比较冗长并且细节琐碎。</p>
+<h2 id="任务目标-2"><a class="header" href="#任务目标-2">任务目标</a></h2>
+<p>能够创建数据表，支持以下 SQL 语句：</p>
+<pre><code class="language-sql">CREATE TABLE student (
+    id      INTEGER PRIMARY KEY,
+    name    VARCHAR NOT NULL,
+    age     INTEGER
+);
+</code></pre>
+<p>【练习】支持 <code>DROP TABLE</code> 语句，删除数据表：</p>
+<pre><code class="language-sql">DROP TABLE student;
+</code></pre>
+<p>【练习】支持 <code>CREATE SCHEMA</code> 语句，创建 schema：</p>
+<pre><code class="language-sql">CREATE SCHEMA school;
+</code></pre>
+<h2 id="整体设计-2"><a class="header" href="#整体设计-2">整体设计</a></h2>
+<p>在加入 Binder 之后，RisingLight 的整个数据处理流程扩展成了这个样子：</p>
+<p><img src="img/01-03-mod.svg" alt="" /></p>
+<p>其中 Binder 插在了 Parser 和 Executor 之间。
+它会将 Parser 生成的 AST 进行处理后，生成一个新的 AST 交给 Executor，在此过程中需要从 Catalog 读取 Schema 信息。
+Executor 拿到绑定后的 AST 去执行，在此过程中可能也会再次修改 Catalog（比如创建一个表）。</p>
+<p>在代码结构上，我们可能会新增以下文件：</p>
+<pre><code>src
+├── binder
+│   ├── mod.rs
+│   └── statement
+│       ├── mod.rs
+│       ├── create.rs
+│       └── select.rs
+├── executor
+│   ├── mod.rs
+│   ├── create.rs
+│   └── select.rs
+...
+</code></pre>
+<p>此外还需要对数据库顶层结构进行修改。</p>
+<h3 id="bound-ast"><a class="header" href="#bound-ast">Bound AST</a></h3>
+<p>Binder 模块的主要任务是给 Parser 生成的 AST 绑定必要的信息。</p>
+<p>由于我们的 Parser 使用了第三方库，不能在它的 AST 结构上扩展新的属性，所以只能定义新的结构来存放这些信息。</p>
+<p>例如对于 <code>CREATE TABLE</code> 语句来说，绑定后的 AST 应该具有以下信息：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// binder/statement/create.rs
+
+/// A bound `CREATE TABLE` statement.
+#[derive(Debug, PartialEq, Clone)]
+pub struct BoundCreateTable {
+    pub schema_id: SchemaId,    // schema name 经过向 catalog 查询转换成了 ID
+    pub table_name: String,
+    pub columns: Vec&lt;(String, ColumnDesc)&gt;,
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>类似地，对于 1.1 中的 <code>SELECT 1</code> 语句而言，我们可以只提取出必要的值来保存：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// binder/statement/select.rs
+
+use crate::parser::Value;
+
+/// A bound `SELECT` statement.
+#[derive(Debug, PartialEq, Clone)]
+pub struct BoundSelect {
+    pub values: Vec&lt;Value&gt;,
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>最后，我们需要定义一个 enum 将各种不同类型的语句聚合起来：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// binder/mod.rs
+
+/// A bound SQL statement.
+#[derive(Debug, PartialEq, Clone)]
+pub enum BoundStatement {
+    CreateTable(BoundCreateTable),
+    Select(BoundSelect),
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>这样，一个 <code>BoundStatement</code> 变量就可以表示 Binder 生成的整个 AST 了。</p>
+<h3 id="binder-1"><a class="header" href="#binder-1">Binder</a></h3>
+<p>接下来，我们实现真正的 <code>Binder</code> 对象。它会将 Parser 生成的 AST 转换成一个新的 AST。
+由于在绑定过程中会访问 Catalog 的数据，<code>Binder</code> 中需要存放一个 Catalog 对象的指针：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Binder {
+    catalog: Arc&lt;Catalog&gt;,
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>我们在 <code>Binder</code> 对象上实现各种 <code>bind</code> 方法来完成对不同 AST 节点的处理：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use crate::parser::{Query, Statement};
+
+impl Binder {
+    pub fn bind(&amp;mut self, stmt: &amp;Statement) -&gt; Result&lt;BoundStatement, BindError&gt; {
+        use Statement::*;
+        match stmt {
+            CreateTable { .. } =&gt; Ok(BoundStatement::CreateTable(self.bind_create_table(stmt)?)),
+            Query(query) =&gt; Ok(BoundStatement::Select(self.bind_select(query)?)),
+            _ =&gt; todo!(&quot;bind statement: {:#?}&quot;, stmt),
+        }
+    }
+
+    fn bind_create_table(&amp;mut self, stmt: &amp;Statement) -&gt; Result&lt;BoundCreateTable, BindError&gt; {
+        // YOUR CODE HERE
+    }
+
+    fn bind_select(&amp;mut self, query: &amp;Query) -&gt; Result&lt;BoundSelect, BindError&gt; {
+        // YOUR CODE HERE
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>注意到这些方法都使用了 <code>&amp;mut self</code> 签名，这是因为 <code>Binder</code> 未来会有内部状态，并且在 bind 过程中还会修改这些状态。</p>
+<!-- 例如对于 `SELECT id FROM student` 语句来说，需要首先扫描 FROM 子句记录下表名 `student`，然后访问 `id` 时才能知道它是否是某个表的列。 -->
+<p>另外在 bind 过程中还可能产生各种各样的错误，比如名称不存在或者重复等等。
+我们将所有可能发生的错误定义在一个 <code>BindError</code> 错误类型中（参考 <a href="../01-01-hello-sql.html#%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86">1.1 错误处理</a>）：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// The error type of bind operations.
+#[derive(thiserror::Error, Debug, PartialEq)]
+pub enum BindError {
+    #[error(&quot;schema not found: {0}&quot;)]
+    SchemaNotFound(String),
+    // ...
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>至于具体的 bind 逻辑，大家可以参考背景知识中描述的过程尝试自己实现。</p>
+<h3 id="executor-1"><a class="header" href="#executor-1">Executor</a></h3>
+<p>在 1.1 中我们实现过一个最简单的执行器，它只是一个函数，拿到 AST 后做具体的执行。
+现在我们有了更多类型的语句，并且在执行它们的过程中还需要访问 Catalog。
+因此和 Binder 类似，我们现在需要将 Executor 也扩展为一个对象：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Executor {
+    catalog: Arc&lt;Catalog&gt;,
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>然后在 <code>Executor</code> 上实现各种 <code>execute</code> 方法来对不同类型的 AST 节点做执行：</p>
+<pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// The error type of execution.
+#[derive(thiserror::Error, Debug)]
+pub enum ExecuteError {...}
+
+impl Executor {
+    pub fn execute(&amp;self, stmt: BoundStatement) -&gt; Result&lt;String, ExecuteError&gt; {
+        match stmt {
+            BoundStatement::CreateTable(stmt) =&gt; self.execute_create_table(stmt),
+            BoundStatement::Select(stmt) =&gt; self.execute_select(stmt),
+        }
+    }
+
+    fn execute_create_table(&amp;self, stmt: BoundCreateTable) -&gt; Result&lt;String, ExecuteError&gt; {
+        // YOUR CODE HERE
+    }
+
+    fn execute_select(&amp;self, query: BoundSelect) -&gt; Result&lt;String, BindError&gt; {
+        // YOUR CODE HERE
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>我们暂时将 Executor 的返回值设定为 <code>String</code> 类型，表示语句的执行结果。
+在下一个任务中，我们会实现更具体的内存数据类型 <code>Array</code> 和 <code>DataChunk</code>。
+到那时，Executor 的输出就是一段真正的数据了。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="内存存储"><a class="header" href="#内存存储">内存存储</a></h1>
+<p>有了表之后，我们就可以向其中导入数据了！数据在被持久化存储之前，会首先写入到内存中。
+因此在本节中我们会先实现一个<strong>内存存储系统（In-memory Storage）</strong>。</p>
+<p>对于分析型数据库（OLAP）而言，为了读取和计算的高效，它们大多使用<strong>列式存储</strong>，即同一列的数据在内存中被紧密地排列在一起。
+这种数据结构就是我们所熟悉的<strong>数组（Array）</strong>。</p>
+<p>每一列的数据用一个数组表示，多个列的数据就组成了<strong>数据块（DataChunk）</strong>。和 <code>Array</code> 一样，<code>DataChunk</code> 也是数据库中重要的基础类型。在我们的内存存储系统中，数据就是以 <code>DataChunk</code> 的形式存储在表内。同时它也是未来数据库执行引擎中，各个算子之间传递数据的基本类型。</p>
+<!-- toc -->
+<h2 id="任务目标-3"><a class="header" href="#任务目标-3">任务目标</a></h2>
+<p>对于四种数据类型：布尔 <code>bool</code>、整数 <code>i32</code>、浮点数 <code>f64</code>、字符串 <code>&amp;str</code>，实现它们的 <code>Array</code>，以及用来构建数组的 <code>ArrayBuilder</code>。</p>
+<p>此外，还需实现一个简单的内存存储系统，支持插入、删除表，并支持向表中插入数据、从表中读取数据。</p>
+<p>一种可供参考的接口设计：</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct InMemoryStorage {...}
+
+impl InMemoryStorage {
+    pub fn new() -&gt; Self {...}
+    pub fn add_table(&amp;self, id: TableRefId) -&gt; StorageResult&lt;()&gt; {...}
+    pub fn get_table(&amp;self, id: TableRefId) -&gt; StorageResult&lt;Arc&lt;InMemoryTable&gt;&gt; {...}
+}
+
+
+pub struct InMemoryTable {...}
+
+impl InMemoryTable {
+    pub fn append(&amp;self, chunk: DataChunk) -&gt; StorageResult&lt;()&gt; {...}
+    pub fn all_chunks(&amp;self) -&gt; StorageResult&lt;Vec&lt;DataChunkRef&gt;&gt; {...}
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>除此之外，本节没有新增的 SQL 测试。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="插入数据insert"><a class="header" href="#插入数据insert">插入数据（<code>INSERT</code>）</a></h1>
+<p>在实现完内存存储系统之后，我们就可以正式向数据库中添加数据了。</p>
+<p>用于向表中插入数据的 SQL 语句是 <code>INSERT</code>，它的一般形式为：</p>
+<pre><code class="language-sql">INSERT INTO t(a, b) VALUES (1, 10), (2, 20)
+</code></pre>
+<p>数据库需要首先解析表达式的值，为每一列构建 Array，然后按列排好序后插入到表中。</p>
+<h2 id="背景知识-3"><a class="header" href="#背景知识-3">背景知识</a></h2>
+<p>TODO</p>
+<h2 id="任务目标-4"><a class="header" href="#任务目标-4">任务目标</a></h2>
+<p>能够向表中插入数据，支持以下 SQL：</p>
+<pre><code class="language-sql">INSERT INTO t(a, b) VALUES (1, 10)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="执行计划"><a class="header" href="#执行计划">执行计划</a></h1>
+<p>为了更好的实现各种复杂的数据查询操作，我们首先扩展。</p>
+<h2 id="背景知识-4"><a class="header" href="#背景知识-4">背景知识</a></h2>
+<h3 id="逻辑计划logical-plan"><a class="header" href="#逻辑计划logical-plan">逻辑计划（Logical Plan）</a></h3>
+<h3 id="物理计划physical-plan"><a class="header" href="#物理计划physical-plan">物理计划（Physical Plan）</a></h3>
+<h2 id="任务目标-5"><a class="header" href="#任务目标-5">任务目标</a></h2>
+<p>能够使用 <code>EXPLAIN</code> 语句输出其它 SQL 语句的执行计划：</p>
+<pre><code class="language-sql">EXPLAIN INSERT INTO t(a, b) VALUES (1, 10)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="查询数据select"><a class="header" href="#查询数据select">查询数据（<code>SELECT</code>）</a></h1>
+<h2 id="任务目标-6"><a class="header" href="#任务目标-6">任务目标</a></h2>
+<p>能够从表中读取数据，支持以下 SQL：</p>
+<pre><code class="language-sql">SELECT * FROM t
+SELECT a, b FROM t
+SELECT a, b, 1 FROM t
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="执行引擎"><a class="header" href="#执行引擎">执行引擎</a></h1>
+<h2 id="背景知识-5"><a class="header" href="#背景知识-5">背景知识</a></h2>
+<h3 id="迭代模型"><a class="header" href="#迭代模型">迭代模型</a></h3>
+<h3 id="物化模型"><a class="header" href="#物化模型">物化模型</a></h3>
+<h3 id="向量化模型"><a class="header" href="#向量化模型">向量化模型</a></h3>
+<h2 id="任务目标-7"><a class="header" href="#任务目标-7">任务目标</a></h2>
+<p>改造数据库执行引擎，实现向量化模型（Vectorizaion Model），使得数据库能够利用多线程并行执行算子。</p>
+<h2 id="整体设计-3"><a class="header" href="#整体设计-3">整体设计</a></h2>
+<h3 id="async-rust-速成"><a class="header" href="#async-rust-速成">Async Rust 速成</a></h3>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="查询"><a class="header" href="#查询">查询</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="算术运算-"><a class="header" href="#算术运算-">算术运算（+-*/）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="条件查询where"><a class="header" href="#条件查询where">条件查询（WHERE）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="排序order-by"><a class="header" href="#排序order-by">排序（ORDER BY）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="限制行数limit"><a class="header" href="#限制行数limit">限制行数（LIMIT）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="聚合sum"><a class="header" href="#聚合sum">聚合（SUM）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="分组聚合group-by"><a class="header" href="#分组聚合group-by">分组聚合（GROUP BY）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="连接join"><a class="header" href="#连接join">连接（JOIN）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="哈希连接hash-join"><a class="header" href="#哈希连接hash-join">哈希连接（Hash Join）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="导入数据copy"><a class="header" href="#导入数据copy">导入数据（COPY）</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tpc-h"><a class="header" href="#tpc-h">TPC-H</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="存储"><a class="header" href="#存储">存储</a></h1>
+<h1 id="什么时候需要列存引擎"><a class="header" href="#什么时候需要列存引擎">什么时候需要列存引擎？🤔</a></h1>
+<p>数据库用户通常会在分析型 (OLAP) 数据库系统上对大量数据进行统计分析。举个例子，假设我们有一张记录用户点击量的表，记录用户什么时候访问了什么网页，从哪里来，看了多久：</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">点击时间 (time)</th><th style="text-align: left">URL</th><th style="text-align: left">用户名 (username)</th><th style="text-align: left">停留时长 (min) (length)</th><th style="text-align: left">来源 (referrer)</th></tr></thead><tbody>
+<tr><td style="text-align: left">10:00am</td><td style="text-align: left">risinglightdb/risinglight</td><td style="text-align: left">user1</td><td style="text-align: left">1</td><td style="text-align: left">github.com</td></tr>
+<tr><td style="text-align: left">10:01am</td><td style="text-align: left">risinglightdb/risinglight/issues</td><td style="text-align: left">user2</td><td style="text-align: left">2</td><td style="text-align: left">github.com/risinglightdb</td></tr>
+<tr><td style="text-align: left">...</td><td style="text-align: left">...</td><td style="text-align: left">...</td><td style="text-align: left">...</td><td style="text-align: left">...</td></tr>
+</tbody></table>
+</div>
+<p>对于数据库用户来说，它们关心的一项内容可能是：过去一小时内，有多少用户访问了 risinglight。</p>
+<pre><code class="language-sql">SELECT count(*) FROM table WHERE time &gt;= &quot;10am&quot; AND time &lt;= &quot;11am&quot;
+</code></pre>
+<p>行存引擎在盘上将同一行的内容存储在一起，列存引擎将一列的内容存储在一起。接下来我们看看这条 query 在行存和列存引擎上分别需要访问多少数据。</p>
+<p><img src="img/03-storage/1-1.svg" alt="" /></p>
+<p>在这个 query 中，我们只需要访问 <code>time</code> 列的数据就能获得结果。在行存引擎里，由于同一行的数据是相邻的，取得 <code>time</code> 值的同时也需要把同一行的其他信息从盘上读取出来。在列存引擎里，由于一列的数据是相邻存储的，我们只需要把这一列的数据读出来就可以得到结果了。因此，OLAP 数据库系统的数据适合存储在列存引擎中。数据按列存放，可以大大提升分析型查询的速度。</p>
+<h1 id="列存引擎如何存储数据"><a class="header" href="#列存引擎如何存储数据">列存引擎如何存储数据？💾</a></h1>
+<h2 id="最简单的列存"><a class="header" href="#最简单的列存">最简单的“列”存</a></h2>
+<p>我们先做一个最简单的假设：用户只有一张表，表只有一列定长类型数据 (i64)。用户写一次就不会再写了。之后用户在表上只跑只读的全表扫描 query。在这种情况下，用什么方式存储数据是最高效的呢？我们从这么几个维度来考虑：</p>
+<ul>
+<li>空间：数据写到盘上需要占用多少空间。
+<ul>
+<li>当我们使用列存引擎存储已经排好序的数据时，相邻的数据大概率会重复。此时若使用 Run-Length 编码 (RLE)，则可以大大减少空间占用。</li>
+</ul>
+</li>
+<li>读取：把数据从盘上读到内存里需要多少开销。
+<ul>
+<li>如果我们使用一种压缩算法直接对整列做压缩，这就意味着每次要从盘上把一整列读上来，在内存里解压，才能读到原始数据。这就会导致一定的读放大。
+考虑到这个场景里用户“扫描全表”、“一次写入”，我们可以选定一种编码方法，按顺序写入数据，一次全部压缩写到盘上。在扫描全表时，一次全部读入并解压。这样可以用最少的空间达到最高效的全表扫描性能。</li>
+</ul>
+</li>
+</ul>
+<p><img src="img/03-storage/1-2.svg" alt="" /></p>
+<h2 id="列存索引"><a class="header" href="#列存索引">列存索引</a></h2>
+<p>用户开始考虑做一些筛选，比如 SELECT count(*) FROM table WHERE x &gt;= 10。其中 x 是这张表的主键。在这种情况下，用户不需要扫描全表了。如果我们依然一次压缩全部写入，在读取的时候就有可能读到大量不需要的数据。因此，我们需要：</p>
+<ul>
+<li><strong>对列做划分，比如每 64K 做一次压缩，而不是全部写入再压缩。</strong>
+<ul>
+<li>计算机的内存是有限的，数据库通常来说都会维护自己的 buffer pool，只缓存一部分盘上的数据。在 RisingLight 的存储引擎中，我们使用 block cache 来缓存这些数据。将数据分块也可以减小缓存换入换出的开销，提升 block cache 的使用率。</li>
+</ul>
+</li>
+<li><strong>存储引擎可以在写入时预先根据 x 对列做排序和索引</strong>，记录每一小块的起始 key，从而快速定位 x &gt;= 10 所在的块在什么位置。</li>
+</ul>
+<p>这样一来，就可以大大减少扫描 x &gt;= 10 的读取量。我们把存储引擎最小的管理单位称作“块 (Block)”。在 RisingLight 中，Block 的大小通常是 64K - 1MB。每次读取时，先从索引找到 x &gt;= 10 对应的块的位置，然后开始读取并解压缩 block，获得原始数据。</p>
+<p>在 RisingLight 中，列文件都使用 .col 后缀存储，索引文件使用 .idx 或者 .sort 后缀存储。</p>
+<p><img src="img/03-storage/1-3.svg" alt="" /></p>
+<p>根据主键做筛选只是一个例子（而且在 RisingLight 里面也没有实现）。在 RisingLight 中，按 block 对列做划分的特性可以用来做 filter scan。比如：</p>
+<pre><code class="language-sql">SELECT sum(y) FROM table WHERE x = 10;
+</code></pre>
+<p>即使 x 不是主键，也不一定在索引里，现在的设计中我们依然可以减少 I/O 量。我们只需要把 x = 10 的行对应的 y 扫描出来就行了。</p>
+<h2 id="存储多个列"><a class="header" href="#存储多个列">存储多个列</a></h2>
+<p>现在用户的数据不止有一列了，而且每一列的数据类型都不同：</p>
+<pre><code class="language-sql">CREATE TABLE t(c1 int, c2 varchar, c3 float, primary key(v1))
+</code></pre>
+<p>数据类型不同，意味着写入时，block 不能根据行对齐。举个例子，在 c1 中，假设前 100 个 i64 数据可以正好塞进一个 block。现在的 c2 列类型是 varchar，每一个数据都是不定长的。它的前 100 行可能塞不满一个 block，也有可能超过一个 block。在这种情况下，我们应该继续保持 block 大小不变，让不同列的同一个位置的 block 包含不同个数的数据；还是保持每个 block 行数相等？</p>
+<p><img src="img/03-storage/1-4.svg" alt="" /></p>
+<p><strong>RisingLight 的选择是不对齐 Block</strong>。这是出于两个考虑：</p>
+<ul>
+<li>Block Cache 更好管理：Block Cache 里的每一项长度几乎相同，只需要限制 Block Cache 的项数就可以很好的估计内存占用。</li>
+<li>I/O 更可控：Block 是最小的管理单元、最小的读盘单元。如果每个 Block 大小几乎相同，每个 I/O 请求的大小就更可控，延迟也更可控。</li>
+</ul>
+<p>多个相同行数的列会被放在同一个文件夹中，称为 RowSet。一个 RowSet 由 n 个列和 n 个索引组成，每一列包含相同的行数。</p>
+<p><img src="img/03-storage/1-5.svg" alt="" /></p>
+<h2 id="存储整张表"><a class="header" href="#存储整张表">存储整张表</a></h2>
+<p>一个用户表的数据通常不可能一次全部导入，用户往往会往表里多次 insert 数据。在 RisingLight 的设计中，每次 insert 都会产生一个新的 RowSet，<strong>所有文件一旦落盘就不会更改</strong>。同一个用户表的所有 RowSet 组合起来，才是完整的表。这里就需要考虑两个问题：</p>
+<ul>
+<li>怎么在读取时把 RowSet 组合成一张表？</li>
+<li>单个 RowSet 可能很小 (几 KB)，也有可能很大 (几 MB)。如何对它们进行整理？</li>
+</ul>
+<p>先考虑读取的问题。在做全表扫描时，我们要一个接着一个地读取 RowSet。这里就需要有一个 <code>ConcatIterator</code> 把 RowSet 拼起来。虽然存储层里面有多个 RowSet，在数据库上层算子看来，它依然是一整张表。对于要按照主键排序的情况，我们需要实现一个 <code>MergeIterator</code>，对多个 RowSet 做多路归并，从而合并多个 RowSet，对计算层暴露一个排好序的表。</p>
+<p>而后考虑整理的问题。用户不断操作数据库系统，产生大量小的 RowSet，并且也有可能“删除” RowSet 中的数据。大量小的 RowSet 对多路归并的性能会产生影响。因此，我们需要定期对存储引擎中的数据做整理。在 Merge-Tree 引擎中，所有文件一旦落盘就不会更改了。因此，如果我们想要整理这些 RowSet，唯一的方法就是把需要整理的 RowSet 读出来，然后生成一个新的 RowSet。这个整理的过程被称为“Compaction”。</p>
+<h2 id="删除"><a class="header" href="#删除">删除</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="memtable"><a class="header" href="#memtable">Memtable</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="编码与写入"><a class="header" href="#编码与写入">编码与写入</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="manifest"><a class="header" href="#manifest">Manifest</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="读取"><a class="header" href="#读取">读取</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="删除-1"><a class="header" href="#删除-1">删除</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="合并"><a class="header" href="#合并">合并</a></h1>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+    </body>
+</html>
