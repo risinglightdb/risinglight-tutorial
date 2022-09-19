@@ -6,39 +6,26 @@ use crate::catalog::CatalogRef;
 mod create;
 mod select;
 
-use self::create::*;
-use self::select::*;
-
 /// The error type of execution.
 #[derive(thiserror::Error, Debug)]
 pub enum ExecuteError {}
 
-pub trait Executor {
-    fn execute(&mut self) -> Result<String, ExecuteError>;
-}
-
-/// A type-erased executor object.
-pub type BoxedExecutor = Box<dyn Executor>;
-
-/// The builder of executor.
-pub struct ExecutorBuilder {
+/// Execute the bound AST.
+pub struct Executor {
     catalog: CatalogRef,
 }
 
-impl ExecutorBuilder {
-    /// Create a new executor builder.
-    pub fn new(catalog: CatalogRef) -> ExecutorBuilder {
-        ExecutorBuilder { catalog }
+impl Executor {
+    /// Create a new executor.
+    pub fn new(catalog: CatalogRef) -> Executor {
+        Executor { catalog }
     }
 
-    /// Build executor from a [BoundStatement].
-    pub fn build(&self, stmt: BoundStatement) -> BoxedExecutor {
+    /// Execute a bound statement.
+    pub fn execute(&self, stmt: BoundStatement) -> Result<String, ExecuteError> {
         match stmt {
-            BoundStatement::CreateTable(stmt) => Box::new(CreateTableExecutor {
-                stmt,
-                catalog: self.catalog.clone(),
-            }),
-            BoundStatement::Select(stmt) => Box::new(SelectExecutor { stmt }),
+            BoundStatement::CreateTable(stmt) => self.execute_create_table(stmt),
+            BoundStatement::Select(stmt) => self.execute_select(stmt),
         }
     }
 }

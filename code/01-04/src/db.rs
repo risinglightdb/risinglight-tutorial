@@ -5,14 +5,14 @@ use std::sync::Arc;
 use crate::array::DataChunk;
 use crate::binder::{BindError, Binder};
 use crate::catalog::{CatalogRef, DatabaseCatalog};
-use crate::executor::{ExecuteError, ExecutorBuilder};
+use crate::executor::{ExecuteError, Executor};
 use crate::parser::{parse, ParserError};
-use crate::storage::InMemoryStorage;
+use crate::storage::{InMemoryStorage, StorageRef};
 
 /// The database instance.
 pub struct Database {
     catalog: CatalogRef,
-    executor_builder: ExecutorBuilder,
+    storage: StorageRef,
 }
 
 impl Default for Database {
@@ -26,10 +26,7 @@ impl Database {
     pub fn new() -> Self {
         let catalog = Arc::new(DatabaseCatalog::new());
         let storage = Arc::new(InMemoryStorage::new());
-        Database {
-            catalog: catalog.clone(),
-            executor_builder: ExecutorBuilder::new(catalog, storage),
-        }
+        Database { catalog, storage }
     }
 
     /// Run SQL queries and return the outputs.
@@ -37,13 +34,13 @@ impl Database {
         // parse
         let stmts = parse(sql)?;
         let mut binder = Binder::new(self.catalog.clone());
+        let executor = Executor::new(self.catalog.clone(), self.storage.clone());
 
         let mut outputs = vec![];
         for stmt in stmts {
             let bound_stmt = binder.bind(&stmt)?;
             debug!("{:#?}", bound_stmt);
-            let mut executor = self.executor_builder.build(bound_stmt);
-            let output = executor.execute()?;
+            let output = executor.execute(bound_stmt)?;
             outputs.push(output);
         }
         Ok(outputs)
