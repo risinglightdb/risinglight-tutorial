@@ -190,4 +190,21 @@ impl InMemoryTable {
 }
 ```
 
+一种可供参考的代码结构：
+
+```
+.
+├── array
+│   ├── data_chunk.rs
+│   ├── iter.rs
+│   ├── mod.rs
+│   ├── primitive_array.rs
+│   └── utf8_array.rs
+└── storage
+    ├── memory
+    │   ├── mod.rs
+    │   └── table.rs
+    └── mod.rs
+```
+
 除此之外，本节没有新增的 SQL 测试。
